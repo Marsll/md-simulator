@@ -20,7 +20,7 @@ setup(
     author='Marcel Hinsche, Leon Klein, Zeno',
     author_email='marcel.hinsche@fu-berlin.de',
     url='https://github.com/Marsll/md-simulator',
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
     packages=['mdsimulator', 'mdsimulator.test'],
     setup_requires=['pytest-runner',],
     install_requires=['numpy'],
