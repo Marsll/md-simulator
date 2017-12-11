@@ -33,6 +33,11 @@ class NeighborList(object):
 
         self.construct_neighbor_list()
 
+    def update(self, ppos):
+        self.pos = ppos
+        self.construct_neighbor_list()
+
+
     def construct_neighbor_list(self):
         for i in range(0, self.n_particles):
             # calculate the cell's index
