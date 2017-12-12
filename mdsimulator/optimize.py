@@ -11,7 +11,7 @@ from cell_order import create_cell_order_3d, create_cell_order_2d
 
 def optimize(ppos, dims, r_cut, alpha=1, **kwargs):
     nl = NeighborList(dims, ppos, r_cut)
-    nbs = create_cell_order_3d(r_cut, dims)
+    nbs = create_cell_order_2d(r_cut, dims)
 
     for i in range(0, 100):
         #print(i)
@@ -19,8 +19,18 @@ def optimize(ppos, dims, r_cut, alpha=1, **kwargs):
         #liste = nl.list
         forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
         ppos = ppos + alpha * forces
+        for pos in ppos:
+            if pos[0] < 0:
+                pos[0] = 0.1
+            if pos[0] > dims[0]:
+                pos[0] = dims[0] 
+            if pos[1] < 0:
+                pos[1] = 0.1
+            if pos[1] > dims[1]:
+                pos[1] = dims[1] 
         #plot_positions(ppos)
         nl.update(ppos)
+        print(ppos)
     return ppos
 
 
@@ -60,7 +70,7 @@ def test_plot_positions():
 
 
 def test_optimize():
-    ppos = np.array([[2.0, 2.0], [6.0, 2.0]])
+    ppos = np.array([[2.0, 2.0], [4.2, 2.0]])
     plot_positions(ppos)
     dim_box = (10, 10, 10)
     #nl = NeighborList(dim_box, ppos, cell_width=1)
