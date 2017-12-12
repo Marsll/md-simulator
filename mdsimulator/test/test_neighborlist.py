@@ -75,8 +75,8 @@ def test_neighbor_list1D():
 
 def test_neighbor_list2D():
     dim_box = (4, 4)
-    pos = np.array([[3.6, 1.6], [3.5, 1.9], [0.2, 0.8], [1.4, 1.7], [1, 2]])
-    cell_width = 1.5
+    pos = np.array([[3.6, 2.6], [3.5, 2.1], [0.2, 0.8], [1.4, 2.9], [1, 2]])
+    cell_width = 2.0
 
     nl = NeighborList(dim_box, pos, cell_width)
 

@@ -26,6 +26,8 @@ class NeighborList(object):
 
         self.cell_width = cell_width
         self.n_cells = np.floor(self.dim_box / cell_width).astype(np.int)
+        #self.cell_width = self.dim_box / self.n_cells
+
         self.total_n_cells = np.prod(self.n_cells)
 
         self.head = np.zeros(self.total_n_cells) - 1
