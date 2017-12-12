@@ -4,14 +4,23 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 from neighbor_list import NeighborList
 import scipy.spatial.distance as dist
-#from lennard_jones.py import all_lenard_jones_forces
+from lennard_jones import all_lenard_jones_forces
+from cell_order import create_cell_order_3d, create_cell_order_2d
 
 
-def optimize(ppos, nl, alpha=1, **kwargs):
-    for i in range(0, 1000):
-        forces = all_lenard_jones_forces(ppos, nl)
+
+def optimize(ppos, dims, r_cut, alpha=1, **kwargs):
+    nl = NeighborList(dims, ppos, r_cut)
+    nbs = create_cell_order_3d(r_cut, dims)
+
+    for i in range(0, 100):
+        #print(i)
+        #head = nl.head
+        #liste = nl.list
+        forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
         ppos = ppos + alpha * forces
-        nl.update()
+        #plot_positions(ppos)
+        nl.update(ppos)
     return ppos
 
 
@@ -51,14 +60,19 @@ def test_plot_positions():
 
 
 def test_optimize():
-    ppos = np.random.rand(3, 3) * 10
+    ppos = np.array([[2.0, 2.0], [6.0, 2.0]])
+    plot_positions(ppos)
     dim_box = (10, 10, 10)
-    nl = NeighborList(dim_box, ppos, cell_width=1)
-    finalppos = optimize(ppos, nl)
+    #nl = NeighborList(dim_box, ppos, cell_width=1)
+    finalppos = optimize(ppos, dim_box, r_cut = 10)
 
     pairwise_distances = dist.pdist(finalppos)
     ref = np.full(pairwise_distances.shape, pairwise_distances[0])
-    np.assert_allclose(pairwise_distances, ref)
+    
+    plot_positions(finalppos)
+    plt.show()
+    #npt.assert_allclose(pairwise_distances, ref)
 
+test_optimize()
 
-test_plot_positions()
+#test_plot_positions()

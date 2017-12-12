@@ -29,14 +29,18 @@ class NeighborList(object):
         #self.cell_width = self.dim_box / self.n_cells
 
         self.total_n_cells = np.prod(self.n_cells)
-
-        self.head = np.zeros(self.total_n_cells) - 1
-        self.list = np.zeros(self.n_particles) - 1
-
+        
+        self.head = np.zeros(self.total_n_cells, dtype=int) - 1
+        self.list = np.zeros(self.n_particles, dtype=int) - 1
+        
         self.construct_neighbor_list()
 
     def update(self, ppos):
         self.pos = ppos
+        
+        self.head[:] = - 1
+        self.list[:] = - 1
+        
         self.construct_neighbor_list()
 
 
