@@ -69,4 +69,8 @@ def create_cell_order_3d(r_cut, dims):
                 order += [nb]
     return order
 
-
+def create_cell_order(r_cut, dims):
+    if len(dims) == 2:
+        return create_cell_order_2d(r_cut, dims)
+    if len(dims) == 3:
+        return create_cell_order_3d(r_cut, dims)

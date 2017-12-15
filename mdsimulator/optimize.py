@@ -5,20 +5,34 @@ from mpl_toolkits.mplot3d import axes3d
 from neighbor_list import NeighborList
 import scipy.spatial.distance as dist
 from lennard_jones import all_lenard_jones_forces
-from cell_order import create_cell_order_3d, create_cell_order_2d
+from cell_order import create_cell_order
 
 
 
-def optimize(ppos, dims, r_cut, alpha=1, **kwargs):
+def optimize(ppos, dims, r_cut, alpha=0.01, **kwargs):
     nl = NeighborList(dims, ppos, r_cut)
-    nbs = create_cell_order_2d(r_cut, dims)
-
+    nbs = create_cell_order(r_cut, dims)
+    
+    forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
+    ppos_new = ppos + alpha * forces
+    
     for i in range(0, 100):
         #print(i)
         #head = nl.head
         #liste = nl.list
+        
+        ppos_old = ppos
+        ppos = ppos_new
+        
+        forces_old = forces
         forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
-        ppos = ppos + alpha * forces
+        
+        delta_force = forces - forces_old
+        delta_ppos = ppos - ppos_old
+        alpha = np.dot(delta_ppos.T, delta_force) / np.dot(delta_force.T, delta_force)
+        
+        ppos_new = ppos + alpha * forces
+        
         for pos in ppos:
             if pos[0] < 0:
                 pos[0] = 0.1
