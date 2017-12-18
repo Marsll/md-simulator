@@ -11,30 +11,36 @@ from cell_order import create_cell_order
 def optimize(ppos, dims, r_cut, alpha=0.01, **kwargs):
     nl = NeighborList(dims, ppos, r_cut)
     nbs = create_cell_order(r_cut, dims)
-
+    """
     forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
     ppos_new = ppos + alpha * forces
     hard_walls(ppos_new, dims)
     alpha_vec = np.zeros(ppos.shape[1])
-
-    for i in range(0, 1):
-        ppos_old = ppos
+"""
+    ppos_new = ppos
+    for i in range(0, 50000):
+        #ppos_old = ppos
         ppos = ppos_new
-        forces_old = forces
+        #forces_old = forces
         forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
 
-        delta_forces = forces - forces_old
-        delta_ppos = ppos - ppos_old
+        #delta_forces = forces - forces_old
+        #delta_ppos = ppos - ppos_old
+        """
         for i, x in enumerate(delta_ppos.T):
             numerator = np.dot(x, delta_forces.T[i])
             denominator = np.linalg.norm(delta_forces.T[i])**2
             alpha_vec[i] = numerator / denominator
-
-        ppos_new = ppos + forces * alpha_vec
+                
+        """
+        norm = np.linalg.norm(forces,axis=1)
+        direction = forces / np.array([norm, norm]).T
+        alpha_vec = np.exp(-i/1000)
+        ppos_new = ppos + direction * alpha_vec
         hard_walls(ppos_new, dims)
         nl.update(ppos)
-        # print(ppos)
-    return ppos_new
+        #print(ppos)
+    return ppos_new, forces
 
 def plot_positions(ppos):
     fig = plt.figure()
@@ -72,16 +78,17 @@ def test_plot_positions():
 
 
 def test_optimize():
-    ppos = np.array([[2.0, 4.0], [4.2, 2.0]])
+    ppos = np.array([[1.0, 3.0], [5.2, 2.0], [8.0, 2.0]])
     plot_positions(ppos)
     dim_box = (10, 10, 10)
     #nl = NeighborList(dim_box, ppos, cell_width=1)
-    finalppos = optimize(ppos, dim_box, r_cut=10)
+    finalppos, forces = optimize(ppos, dim_box, r_cut=10)
 
     pairwise_distances = dist.pdist(finalppos)
     ref = np.full(pairwise_distances.shape, pairwise_distances[0])
 
     plot_positions(finalppos)
+    plot_forces(finalppos, forces)
     plt.show()
     return finalppos
     #npt.assert_allclose(pairwise_distances, ref)
