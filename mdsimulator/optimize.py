@@ -8,45 +8,33 @@ from lennard_jones import all_lenard_jones_forces
 from cell_order import create_cell_order
 
 
-
 def optimize(ppos, dims, r_cut, alpha=0.01, **kwargs):
     nl = NeighborList(dims, ppos, r_cut)
     nbs = create_cell_order(r_cut, dims)
-    
+
     forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
     ppos_new = ppos + alpha * forces
-    
-    for i in range(0, 100):
-        #print(i)
-        #head = nl.head
-        #liste = nl.list
-        
+    hard_walls(ppos_new, dims)
+    alpha_vec = np.zeros(ppos.shape[1])
+
+    for i in range(0, 1):
         ppos_old = ppos
         ppos = ppos_new
-        
         forces_old = forces
         forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
-        
-        delta_force = forces - forces_old
-        delta_ppos = ppos - ppos_old
-        alpha = np.dot(delta_ppos.T, delta_force) / np.dot(delta_force.T, delta_force)
-        
-        ppos_new = ppos + alpha * forces
-        
-        for pos in ppos:
-            if pos[0] < 0:
-                pos[0] = 0.1
-            if pos[0] > dims[0]:
-                pos[0] = dims[0] 
-            if pos[1] < 0:
-                pos[1] = 0.1
-            if pos[1] > dims[1]:
-                pos[1] = dims[1] 
-        #plot_positions(ppos)
-        nl.update(ppos)
-        print(ppos)
-    return ppos
 
+        delta_forces = forces - forces_old
+        delta_ppos = ppos - ppos_old
+        for i, x in enumerate(delta_ppos.T):
+            numerator = np.dot(x, delta_forces.T[i])
+            denominator = np.linalg.norm(delta_forces.T[i])**2
+            alpha_vec[i] = numerator / denominator
+
+        ppos_new = ppos + forces * alpha_vec
+        hard_walls(ppos_new, dims)
+        nl.update(ppos)
+        # print(ppos)
+    return ppos_new
 
 def plot_positions(ppos):
     fig = plt.figure()
@@ -84,19 +72,53 @@ def test_plot_positions():
 
 
 def test_optimize():
-    ppos = np.array([[2.0, 2.0], [4.2, 2.0]])
+    ppos = np.array([[2.0, 4.0], [4.2, 2.0]])
     plot_positions(ppos)
     dim_box = (10, 10, 10)
     #nl = NeighborList(dim_box, ppos, cell_width=1)
-    finalppos = optimize(ppos, dim_box, r_cut = 10)
+    finalppos = optimize(ppos, dim_box, r_cut=10)
 
     pairwise_distances = dist.pdist(finalppos)
     ref = np.full(pairwise_distances.shape, pairwise_distances[0])
-    
+
     plot_positions(finalppos)
     plt.show()
+    return finalppos
     #npt.assert_allclose(pairwise_distances, ref)
 
-test_optimize()
 
-#test_plot_positions()
+def hard_walls(ppos, dims):
+    ppos[ppos <= 0] = 0.1
+    for i, x in enumerate(ppos.T):
+        x[x > dims[i]] = dims[i]
+
+
+def test_hard_walls():
+    ppos = np.array([[1, 2, 3],
+                     [7, -9, 10],
+                     [-5, 5, 6]])
+    dims = np.array([10, 2, 5])
+
+    ref_arr = np.array([[1, 2, 3],
+                        [7, 0, 5],
+                        [0, 2, 5]])
+    npt.assert_equal(hard_walls(ppos, dims), )
+
+
+print(test_optimize())
+# test_hard_walls()
+# test_plot_positions()
+
+
+# Avoid this!!! Use numpy, it is really powerful and helps avoiding
+# if clauses and for-loops
+# for pos in ppos:
+#     if pos[0] < 0:
+#         pos[0] = 0.1
+#     if pos[0] > dims[0]:
+#         pos[0] = dims[0]
+#     if pos[1] < 0:
+#         pos[1] = 0.1
+#     if pos[1] > dims[1]:
+#         pos[1] = dims[1]
+# plot_positions(ppos)
