@@ -8,7 +8,7 @@ from lennard_jones import all_lenard_jones_forces
 from cell_order import create_cell_order
 
 
-def optimize(ppos, dims, r_cut, alpha=0.01, **kwargs):
+def optimize(ppos, dims, r_cut, cut=.5, alpha=1, **kwargs):
     nl = NeighborList(dims, ppos, r_cut)
     nbs = create_cell_order(r_cut, dims)
     """
@@ -17,6 +17,7 @@ def optimize(ppos, dims, r_cut, alpha=0.01, **kwargs):
     hard_walls(ppos_new, dims)
     alpha_vec = np.zeros(ppos.shape[1])
 """
+
     ppos_new = ppos
     for i in range(0, 50000):
         #ppos_old = ppos
@@ -33,13 +34,15 @@ def optimize(ppos, dims, r_cut, alpha=0.01, **kwargs):
             alpha_vec[i] = numerator / denominator
                 
         """
-        norm = np.linalg.norm(forces,axis=1)
+
+        norm = np.linalg.norm(forces, axis = 1)
         direction = forces / np.array([norm, norm]).T
-        alpha_vec = np.exp(-i/1000)
-        ppos_new = ppos + direction * alpha_vec
+        forces[norm > cut] = cut * direction[norm > cut]
+        alpha_ = alpha
+        ppos_new = ppos + forces * alpha_
         hard_walls(ppos_new, dims)
         nl.update(ppos)
-        #print(ppos)
+        print(ppos)
     return ppos_new, forces
 
 def plot_positions(ppos):
@@ -78,7 +81,7 @@ def test_plot_positions():
 
 
 def test_optimize():
-    ppos = np.array([[1.0, 3.0], [5.2, 2.0], [8.0, 2.0]])
+    ppos = np.array([[3.1, 2.0], [7.2, 2.0]])
     plot_positions(ppos)
     dim_box = (10, 10, 10)
     #nl = NeighborList(dim_box, ppos, cell_width=1)
