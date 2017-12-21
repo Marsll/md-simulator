@@ -7,17 +7,18 @@ import scipy.spatial.distance as dist
 from lennard_jones import all_lenard_jones_potential
 from cell_order import create_cell_order
 
-def mcmc(ppos, dims, r_cut, alpha=0.1, prob=1, beta=1000, **kwargs):
+def mcmc(ppos, dims, r_cut, alpha=0.1, beta=1000, **kwargs):
     """Returns the configuration with minimal energy using MC"""
     nl = NeighborList(dims, ppos, r_cut)
     nbs = create_cell_order(r_cut, dims)
     potential = all_lenard_jones_potential(ppos, nl, nbs, r_cut)
-    for i in range (0, 1000000):
+    
+    for i in range (0, 100000):
         potential_old = np.copy(potential)
         ppos_old = np.copy(ppos)
         ppos += alpha * (np.random.random(np.shape(ppos)) - 0.5)
         potential = all_lenard_jones_potential(ppos, nl, nbs, r_cut)
-        if potential >= potential_old: #and np.exp(-(potential-potential_old) * beta) < np.random.rand():
+        if potential >= potential_old and np.exp(-(potential-potential_old) * beta) < np.random.rand():
             ppos = np.copy(ppos_old)
             potential = np.copy(potential_old)
         hard_walls(ppos, dims)
@@ -42,14 +43,16 @@ def plot_positions(ppos):
     elif dims == 1:
         y = np.zeros(ppos.shape[0])
         plt.plot(*ppos.T, np.zeros_like(y), "o")
+        
+
 
 
 def test_optimize():
-    ppos = np.array([[3.1, 2.0], [3.2, 2.0], [1, 1.], [1., 2]])
+    ppos = np.array([[3.1, 2.0, 1.], [3.2, 2.0, 6], [3, 4., 2], [5.1, 5.1, 5.1]])
     plot_positions(ppos)
     dim_box = (10, 10, 10)
-    #nl = NeighborList(dim_box, ppos, cell_width=1)
-    finalppos, potential = mcmc(ppos, dim_box, r_cut=10)
+
+    finalppos, potential = mcmc(ppos, dim_box, r_cut=5)
 
     pairwise_distances = dist.pdist(finalppos)
     ref = np.full(pairwise_distances.shape, pairwise_distances[0])
@@ -57,7 +60,7 @@ def test_optimize():
     plot_positions(finalppos)
 
     plt.show()
-    return finalppos, potential
+    return finalppos, potential, pairwise_distances
 
 print(test_optimize())
 

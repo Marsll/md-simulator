@@ -26,9 +26,9 @@ def create_cell_order_2d(r_cut, dims):
 
 def create_cell_order_3d(r_cut, dims):
     """Returns array with all neighbors of each cell"""
-    size = np.empty(len(dims))
-    for i, dim in enumerate(dims):
-        size[i] = np.int(dim / r_cut)
+
+    size = np.floor(np.array(dims) / r_cut).astype(np.int)
+
     order = []
     for k in np.arange(0, size[2]):
         for j in np.arange(0, size[1]):

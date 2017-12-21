@@ -43,7 +43,7 @@ def all_lenard_jones_forces(ppos, nl, nbs, r_cut=10, epsillon=1, sigma=1):
             for nb in nbs[i]:
                 next_nbcell = nl.head[nb]
                 while next_nbcell != -1:    
-                    force = lenard_jones_forces(
+                    force += lenard_jones_forces(
                         ppos[cell], ppos[next_nbcell], r_cut, epsillon, sigma)
                     forces[cell] += force
                     forces[next_nbcell] += - force
@@ -69,7 +69,7 @@ def all_lenard_jones_potential(ppos, nl, nbs, r_cut=20, epsillon=1, sigma=1):
             for nb in nbs[i]:
                 next_nbcell = nl.head[nb]
                 while next_nbcell != -1:
-                    potential = lenard_jones_potential(
+                    potential += lenard_jones_potential(
                         ppos[cell], ppos[next_nbcell], r_cut, epsillon, sigma)
                     next_nbcell = nl.list[next_nbcell]
             cell = nl.list[cell]
