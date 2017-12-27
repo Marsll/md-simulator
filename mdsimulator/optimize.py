@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 from neighbor_list import NeighborList
 import scipy.spatial.distance as dist
-from lennard_jones import all_lenard_jones_forces
+from lennard_jones import all_lennard_jones_forces
 from cell_order import create_cell_order
 
 
@@ -12,7 +12,7 @@ def optimize(ppos, dims, r_cut, cut=.5, alpha=1, **kwargs):
     nl = NeighborList(dims, ppos, r_cut)
     nbs = create_cell_order(r_cut, dims)
     """
-    forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
+    forces = all_lennard_jones_forces(ppos, nl, nbs, r_cut)
     ppos_new = ppos + alpha * forces
     hard_walls(ppos_new, dims)
     alpha_vec = np.zeros(ppos.shape[1])
@@ -23,7 +23,7 @@ def optimize(ppos, dims, r_cut, cut=.5, alpha=1, **kwargs):
         #ppos_old = ppos
         ppos = ppos_new
         #forces_old = forces
-        forces = all_lenard_jones_forces(ppos, nl, nbs, r_cut)
+        forces = all_lennard_jones_forces(ppos, nl, nbs, r_cut)
 
         #delta_forces = forces - forces_old
         #delta_ppos = ppos - ppos_old
