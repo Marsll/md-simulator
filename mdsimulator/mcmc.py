@@ -7,13 +7,13 @@ import scipy.spatial.distance as dist
 from lennard_jones import all_lenard_jones_potential
 from cell_order import create_cell_order
 
-def mcmc(ppos, dims, r_cut, alpha=0.1, beta=1000, **kwargs):
+def mcmc(ppos, dims, r_cut, alpha=0.1, beta=1000, steps=10000, **kwargs):
     """Returns the configuration with minimal energy using MC"""
     nl = NeighborList(dims, ppos, r_cut)
     nbs = create_cell_order(r_cut, dims)
     potential = all_lenard_jones_potential(ppos, nl, nbs, r_cut)
     
-    for i in range (0, 100000):
+    for i in range (0, steps):
         potential_old = np.copy(potential)
         ppos_old = np.copy(ppos)
         ppos += alpha * (np.random.random(np.shape(ppos)) - 0.5)
@@ -62,6 +62,17 @@ def test_optimize():
     plt.show()
     return finalppos, potential, pairwise_distances
 
-print(test_optimize())
+def test_mcmc():
+    """Three particles in a hard box."""
+    ppos = np.random.random([3,3]) * 5
+    plot_positions(ppos)
+    dim_box = (10, 10, 10)
+    potential_ref = -3.
+    finalppos, potential = mcmc(ppos, dim_box, r_cut=5, steps=10000)
+    np.testing.assert_almost_equal(potential, potential_ref)
+
+test_mcmc()
+    
+#print(test_optimize())
 
 

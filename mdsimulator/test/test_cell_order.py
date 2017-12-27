@@ -1,4 +1,4 @@
-from ..cell_order import create_cell_order_3d, create_cell_order_2d
+from cell_order import create_cell_order_3d, create_cell_order_2d
 import numpy as np
 import numpy.testing as npt
 
