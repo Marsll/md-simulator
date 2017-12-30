@@ -85,3 +85,16 @@ def test_neighbor_list2D():
 
     npt.assert_equal(nl.head, reference_nl_head)
     npt.assert_equal(nl.list, reference_nl_list)
+
+def test_update_nl1D():
+    dim_box = 2
+    pos = np.array([[0.2], [0.3], [1.0], [1.8]])
+    cell_width = 1
+
+    nl = NeighborList(dim_box, pos, cell_width)
+
+    pos_new = np.array([[0.2], [0.3], [1.0], [1.8]])
+    nl.update(pos_new)
+
+    print("head", nl.head)
+    print()
