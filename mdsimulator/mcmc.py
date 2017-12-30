@@ -18,12 +18,13 @@ def mcmc(ppos, dims, r_cut, alpha=0.1, beta=1000, steps=10000, **kwargs):
         potential_old = np.copy(potential)
         ppos_old = np.copy(ppos)
         ppos += alpha * (np.random.random(np.shape(ppos)) - 0.5)
+        #deutlich logischer hier zu machen, sonst kömnen Teilchen zeitweise außerhalb der box sein
+        hard_walls(ppos, dims)
         potential = all_lennard_jones_potential(ppos, nl, nbs, r_cut)
-#        if potential >= potential_old and np.exp(-(potential - potential_old) * beta) < np.random.rand():
-        if np.exp(-(potential - potential_old) * beta) < np.random.rand():
+        if potential >= potential_old and np.exp(-(potential - potential_old) * beta) < np.random.rand():
             ppos = np.copy(ppos_old)
             potential = np.copy(potential_old)
-        hard_walls(ppos, dims)
+     
         nl.update(ppos)
         # print(potential,ppos)
     return ppos, potential
@@ -43,25 +44,26 @@ def mcmc_step(ppos, dims, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
 
     diff = 1000
 
-    if e_trial < e_pot or np.random.rand() < np.exp(beta * (epot - e_trial)):
-        ppos_trial = hard_walls(ppos_trial, dims)
+    if e_trial < epot or np.random.rand() < np.exp(beta * (epot - e_trial)):
+        hard_walls(ppos_trial, dims)
         diff = np.absolute(epot - e_trial)
         nl.update(ppos_trial)
         return ppos_trial, e_trial, diff, nbs, nl
     return ppos, epot, diff, nbs, nl
 
 
-def mcmc_alternativ(ppos, dims, r_cut, alpha=0.1, beta=1000, tol=1E-3, max_steps=1000, **kwargs):
+def mcmc_alternativ(ppos, dims, r_cut, alpha=0.1, beta=1000, tol=1E-8, max_steps=1000, **kwargs):
     nl = NeighborList(dims, ppos, r_cut)
     nbs = create_cell_order(r_cut, dims)
     epot = all_lennard_jones_potential(ppos, nl, nbs, r_cut)
     diff = 1000
     count = 0
-    while count < max_steps and diff <= tol:
+    while count < max_steps and diff >= tol:
         count += 1
         ppos, epot, diff, nbs, nl = mcmc_step(
             ppos, dims, r_cut, nbs, nl, alpha, beta, epot)
         # print(potential,ppos)
+    print(count)
     return ppos, epot
 
 
@@ -114,6 +116,17 @@ def test_mcmc():
 
 test_mcmc()
 
+def test_mcmc_2():
+    """Four particles in a hard box. Only one cell."""
+    ppos = np.random.random([4, 3]) * 5
+    plot_positions(ppos)
+    dim_box = (10, 10, 10)
+    potential_ref = -6.
+    finalppos, potential = mcmc(ppos, dim_box, r_cut=10, steps=10000)
+    np.testing.assert_almost_equal(potential, potential_ref, decimal=2)
+    
+#test_mcmc_2() 
+    
 # print(test_optimize())
 
 
@@ -128,4 +141,4 @@ def test_alternives_mcmc():
     print(potential, finalppos)
 
 
-# test_alternives_mcmc()
+test_alternives_mcmc()
