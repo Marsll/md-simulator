@@ -63,7 +63,7 @@ def mcmc_alternativ(ppos, dims, r_cut, alpha=0.1, beta=1000, tol=1E-8, max_steps
         ppos, epot, diff, nbs, nl = mcmc_step(
             ppos, dims, r_cut, nbs, nl, alpha, beta, epot)
         # print(potential,ppos)
-    print(count)
+    #print(count)
     return ppos, epot
 
 
@@ -137,7 +137,7 @@ def test_alternives_mcmc():
     dim_box = (10, 10, 10)
     finalppos, potential = mcmc_alternativ(ppos, dim_box, r_cut=5)
     plot_positions(finalppos)
-    plt.show()
+    #plt.show()
     print(potential, finalppos)
 
 

@@ -94,7 +94,7 @@ def create_grid(n_cells):
     grid = grid.reshape(n_cells)
     return grid
 
-
+'''
 def create_periodic_cell_order(n_cells):
     grid = create_grid(n_cells)
     dimensions = len(n_cells)
@@ -122,11 +122,13 @@ def create_periodic_cell_order(n_cells):
         for j, vec in enumerate(nb_vectors):
             neighbors[i, j] = grid[i + vec]
 
+
     return neighbors
+
 
 print(create_periodic_cell_order(np.array([3, 3])))
 
-
+'''
 
 #grid(np.array( [2,4]))
 
