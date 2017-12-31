@@ -57,6 +57,3 @@ for j, idx in enumerate(np.nditer(cell_idx)):
 #print(len(nbs))
 #print(idx_list)
 '''
-
-
-
