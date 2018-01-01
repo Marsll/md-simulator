@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.testing as npt
+from .neighbor_order_pbc import get_n_cells
 
 
 class NeighborList(object):
@@ -22,8 +23,7 @@ class NeighborList(object):
         self.ppos = ppos
         self.n_particles = len(ppos)
 
-        self.cell_width = cell_width
-        self.n_cells = np.floor(self.box / cell_width).astype(np.int)
+        self.n_cells = get_n_cells(box, cell_width)
         self.cell_width = self.box / self.n_cells
 
         self.total_n_cells = np.prod(self.n_cells)
@@ -46,7 +46,7 @@ class NeighborList(object):
 
         self.construct_neighbor_list()
 
-    def discard_update():
+    def discard_update(self):
         self.head = self.head_old
         self.list = self.list_old
 
