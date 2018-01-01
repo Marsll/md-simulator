@@ -3,45 +3,52 @@ import numpy.testing as npt
 
 
 class NeighborList(object):
-    """ToDo: 
-    - add documentation
+    """ Cell linked list implementation.
+
+    The simulation box is partioned in cells of equal size.
+    head contains a "starting" pointer to a particle in list.
+    Every element in head stands for one particular cell
+    In list the particles that correspond to the cell point to
+    each other - they are linked - until there are no more.
+    Then the last pointer is simply -1.P
+    ToDo:
     - Edge cases: particles cannot be on the edges of the box
         in particular the right and upper edge
-    - Questions: If the dimension of the box is not a multiple of the cell
-        width, then what? Effects?
-    - Do I want to pass the whole object around (or olny reference in python?)
-        with all its attributes
-        or rather only head and list? If yes, how to separate?
-         * Consider that when updating the neighbor list, we need a lot of
-         the attributes again.
-    - Should we care about making anything private?
-    - Working directory issues when testing
     """
 
-    def __init__(self, dim_box, ppos, cell_width):
-        self.dim_box = np.atleast_1d(np.asarray(dim_box))
+    def __init__(self, box, ppos, cell_width):
+        self.box = np.atleast_1d(np.asarray(box))
 
         self.ppos = ppos
         self.n_particles = len(ppos)
 
         self.cell_width = cell_width
-        self.n_cells = np.floor(self.dim_box / cell_width).astype(np.int)
-        self.cell_width = self.dim_box / self.n_cells
+        self.n_cells = np.floor(self.box / cell_width).astype(np.int)
+        self.cell_width = self.box / self.n_cells
 
         self.total_n_cells = np.prod(self.n_cells)
 
         self.head = np.zeros(self.total_n_cells, dtype=int) - 1
         self.list = np.zeros(self.n_particles, dtype=int) - 1
 
+        self.head_old = None
+        self.list_old = None
+
         self.construct_neighbor_list()
 
-    def update(self, pppos):
-        self.ppos = pppos
-
+    def update(self, ppos, keep_old=True):
+        self.ppos = ppos
+        if keep_old:
+            self.head_old = np.copy(self.head)
+            self.list_old = np.copy(self.list)
         self.head[:] = - 1
         self.list[:] = - 1
 
         self.construct_neighbor_list()
+
+    def discard_update():
+        self.head = self.head_old
+        self.list = self.list_old
 
     def construct_neighbor_list(self):
         for i in range(0, self.n_particles):
@@ -59,16 +66,11 @@ class NeighborList(object):
         cell_index = 0
         dims = len(self.ppos[num])
         indexes = np.floor(self.ppos[num] / self.cell_width)
-        #print(self.n_cells)
-        # Handle case when particle is in one of the bigger cells, due to floor
-        for i in range(len(indexes)):
-            if indexes[i] > self.n_cells[i] - 1:
-                indexes[i] = self.n_cells[i] - 1
         for i in range(0, dims):
-            #print(cell_index)
-            cell_index += indexes[i] * np.prod(self.n_cells[i+1:])
+            cell_index += indexes[i] * np.prod(self.n_cells[i + 1:])
 
         return cell_index.astype(np.int)
+
 
 '''
         for i in range(dims - 1, -1, -1):

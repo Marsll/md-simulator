@@ -15,7 +15,7 @@ def get_neighbors(box):
     columns = []
     # equivalent to dim nested loops over offsets
     for shift in itertools.product(offsets, repeat=dim):
-        columns.append(np.roll(box, shift, np.arange(dim)).ravel())
+        columns.append(np.roll(box, shift, np.arange(dim)[:]).ravel())
     neighbors = np.stack(columns, axis=-1)
     # All neighbor pairs are accounted for twice, thus, we mask every
     # redudant occurence with -1
