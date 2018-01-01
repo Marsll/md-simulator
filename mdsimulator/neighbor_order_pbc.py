@@ -9,17 +9,18 @@ import numpy as np
 import itertools
 
 def get_n_cells(box, cell_width):
+    box = np.atleast_1d(np.asarray(box))
     n_cells = np.floor(box / cell_width).astype(np.int)
     return n_cells
 
-def create_cell_array(n_cells)
+def create_cell_array(n_cells):
     total_n_cells = np.prod(n_cells)
     cell_array = np.arange(total_n_cells)
-    cell_array = box.reshape(n_cells)
+    cell_array = cell_array.reshape(n_cells)
     return cell_array
 
 def get_neighbors(cell_array):
-    dim = len(box.shape)       # number of dimensions
+    dim = len(cell_array.shape)       # number of dimensions
     offsets = [0, -1, 1]     # offsets, 0 first so the original entry is first
     columns = []
     # equivalent to dim nested loops over offsets

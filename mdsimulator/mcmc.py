@@ -51,6 +51,15 @@ def hard_walls(ppos, dims):
     for i, x in enumerate(ppos.T):
         x[x > dims[i]] = dims[i]
 
+def back_map(ppos, box):
+    for i, length in enumerate(box):
+        while any(ppos[:,i] >= length):
+            ppos.T[i][ppos[:,i] >= length] -= length
+        while any(ppos[:,i] < 0):
+            ppos.T[i][ppos[:,i] < 0] += length
+    return ppos
+
+
 
 def plot_positions(ppos):
     fig = plt.figure()
