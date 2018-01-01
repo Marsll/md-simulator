@@ -33,7 +33,7 @@ def get_neighbors(cell_array):
     # First column stands for the cells themselves, discard it
     # Last row stands for neighbors of the last cell, these have all been
     # accounted for already, discard it
-    neighbors = neighbors[:-1, 1:]
+    neighbors = neighbors[:, 1:]
     # In case of small dimensions (dims <= 2), we also discard double counting
     # Finally, we discard also the -1 and but all cleaned up rows in a list
     nbs = []

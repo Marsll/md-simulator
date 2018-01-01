@@ -65,6 +65,7 @@ def all_lennard_jones_potential(ppos, nl, nbs, r_cut=20, epsilon=1, sigma=1):
             while next_cell != -1:
                 potential += lennard_jones_potential(
                     ppos[cell], ppos[next_cell], box, r_cut, epsilon, sigma)
+                print(potential)
                 next_cell = nl.list[next_cell]
             # neighbour cells
             for nb in nbs[i]:
@@ -72,6 +73,7 @@ def all_lennard_jones_potential(ppos, nl, nbs, r_cut=20, epsilon=1, sigma=1):
                 while next_nbcell != -1:
                     potential += lennard_jones_potential(
                         ppos[cell], ppos[next_nbcell], box, r_cut, epsilon, sigma)
+                    print(potential)
                     next_nbcell = nl.list[next_nbcell]
             cell = nl.list[cell]
     return potential
