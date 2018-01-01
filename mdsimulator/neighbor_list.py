@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.testing as npt
-from .neighbor_order_pbc import get_n_cells
+from neighbor_order_pbc import get_n_cells
 
 
 class NeighborList(object):
