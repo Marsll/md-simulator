@@ -1,5 +1,6 @@
 from ..lennard_jones_periodic import lennard_jones_forces, lennard_jones_potential, all_lennard_jones_forces, all_lennard_jones_potential, lennard_jones
 from ..neighbor_order_pbc import create_nb_order
+from .. neighbor_list import NeighborList
 import numpy as np
 import numpy.testing as npt
 
@@ -38,40 +39,19 @@ test_force_3d()
 
 def test_potential_3d_three_particles():
     """8 cells, three particles, all in same octant"""
-    class TestNl(object):
-        def __init__(self):
-            self.head = np.array([2, -1, -1, -1, -1, -1, -1, -1])
-            self.list = np.array([-1, 0, 1])
+    box = [10, 10, 10]
+    r_cut = 5 
+    nb_order = create_nb_order(box, r_cut)
 
-    cell_order = create_nb_order([10, 10, 10], 5)
-
-    test = TestNl()
     ppos = np.array([[0, 0, 0], [3, 4, 0], [4, 3, 0]])
+    
+    nl = NeighborList(box, ppos, r_cut)
 
     potential = all_lennard_jones_potential(
-        ppos, test, cell_order, r_cut=5, epsilon=1, sigma=1)
+        ppos, nl, nb_order, r_cut=5, epsilon=1, sigma=1)
     potential_ref = 2 * (-0.00025598361) - 0.4375
     npt.assert_almost_equal(potential, potential_ref)
 
-
-
-def test_potential_3d_four_particles():
-    """8 cells, four particles, all in different octants"""
-    class TestNl(object):
-        def __init__(self):
-            self.head = np.array([0, 1, 2, 3, -1, -1, -1, -1])
-            self.list = np.array([-1, -1, -1, -1])
-
-    cell_order = create_cell_order(5, [10, 10, 10])
-
-    test = TestNl()
-    particle_position_test = np.array(
-        [[4.5, 4.5, 4.5], [5.5, 4.5, 4.5], [4.5, 5.5, 4.5], [5.5, 5.5, 4.5]])
-
-    potential = all_lennard_jones_potential(
-        particle_position_test, test, cell_order, r_cut=5, epsilon=1, sigma=1)
-    potential_ref = 2 * (- 0.4375)
-    npt.assert_almost_equal(potential, potential_ref)
 
 
 test_potential_3d_three_particles()
