@@ -15,7 +15,7 @@ def test1_cell_index2D():
 
     reference_idx1 = 0
     reference_idx2 = 8
-    reference_idx3 = 7
+    reference_idx3 = 5
 
     npt.assert_equal(idx1, reference_idx1)
     npt.assert_equal(idx2, reference_idx2)
@@ -49,14 +49,24 @@ def test_cell_index3D():
     idx2 = nl.get_cell_index(1)
     idx3 = nl.get_cell_index(2)
 
-    reference_idx1 = 841
-    reference_idx2 = 100
-    reference_idx3 = 753
+    reference_idx1 = 148
+    reference_idx2 = 1
+    reference_idx3 = 357
 
     npt.assert_equal(idx1, reference_idx1)
     npt.assert_equal(idx2, reference_idx2)
     npt.assert_equal(idx3, reference_idx3)
 
+def test2_cell_index3D():
+    dim_box = np.array([2, 4, 4])
+    pos = np.array([[1.5, 2.5, 3.5]])
+    cell_width = 1
+
+    nl = NeighborList(dim_box, pos, cell_width)
+    idx1 = nl.get_cell_index(0)
+
+    reference_idx1 = 27
+    npt.assert_equal(idx1, reference_idx1)
 
 
 def test_neighbor_list1D():
@@ -80,8 +90,21 @@ def test_neighbor_list2D():
 
     nl = NeighborList(dim_box, pos, cell_width)
 
-    reference_nl_head = np.array([2, -1, 4, 1])
+    reference_nl_head = np.array([2, 4, -1, 1])
     reference_nl_list = np.array([-1, 0, -1, -1, 3])
 
     npt.assert_equal(nl.head, reference_nl_head)
     npt.assert_equal(nl.list, reference_nl_list)
+
+def test_update_nl1D():
+    dim_box = 2
+    pos = np.array([[0.2], [0.3], [1.0], [1.8]])
+    cell_width = 1
+
+    nl = NeighborList(dim_box, pos, cell_width)
+
+    pos_new = np.array([[0.2], [0.3], [1.0], [1.8]])
+    nl.update(pos_new)
+
+    print("head", nl.head)
+    print()

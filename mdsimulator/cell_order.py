@@ -1,12 +1,9 @@
 import numpy as np
-import numpy.testing as npt
-
 
 def create_cell_order_2d(r_cut, dims):
-    """Returns array with all neighbors of each cell"""
-    size = np.empty(len(dims))
-    for i, dim in enumerate(dims):
-        size[i] = np.int(dim / r_cut)
+    """Return array with all neighbors of each cell"""
+    size = np.floor(np.array(dims) / r_cut).astype(np.int)
+
     order = []
     for j in np.arange(0, size[1]):
         for i in np.arange(0, size[0]):
@@ -25,10 +22,10 @@ def create_cell_order_2d(r_cut, dims):
 
 
 def create_cell_order_3d(r_cut, dims):
-    """Returns array with all neighbors of each cell"""
-    size = np.empty(len(dims))
-    for i, dim in enumerate(dims):
-        size[i] = np.int(dim / r_cut)
+    """Return array with all neighbors of each cell"""
+
+    size = np.floor(np.array(dims) / r_cut).astype(np.int)
+
     order = []
     for k in np.arange(0, size[2]):
         for j in np.arange(0, size[1]):
@@ -70,43 +67,8 @@ def create_cell_order_3d(r_cut, dims):
     return order
 
 
-"""Tests"""
-
-
-def test_cell_order_2d():
-    """Test for 6 cells in 2d"""
-    cell_order_reference = [[1, 3, 4], [2, 3, 4, 5], [4, 5], [4], [5], []]
-    cell_order = create_cell_order_2d(1, [3, 2])
-    npt.assert_array_equal(cell_order_reference, cell_order)
-
-
-def test_cell_order_2d_one_cell():
-    """Test for 6 cells in 2d"""
-    cell_order_reference = [[]]
-    cell_order = create_cell_order_2d(1, [1, 1])
-    npt.assert_array_equal(cell_order_reference, cell_order)
-
-
-test_cell_order_2d()
-test_cell_order_2d_one_cell()
-
-
-def test_cell_order_3d():
-    """Test for 8 cells in 2d"""
-    cell_order_reference = [[1, 2, 3, 4, 5, 6, 7], [2, 3, 4, 5, 6, 7], [
-        3, 4, 5, 6, 7], [4, 5, 6, 7], [5, 6, 7], [6, 7], [7], []]
-    cell_order = create_cell_order_3d(1, [2, 2, 2])
-    npt.assert_array_equal(cell_order_reference, cell_order)
-
-
-def test_cell_order_3d_one_cell():
-    """Test for 6 cells in 2d"""
-    cell_order_reference = [[]]
-    cell_order = create_cell_order_3d(1, [1, 1, 1])
-    npt.assert_array_equal(cell_order_reference, cell_order)
-
-
-test_cell_order_3d()
-test_cell_order_3d_one_cell()
-
-print("tests done")
+def create_cell_order(r_cut, dims):
+    if len(dims) == 2:
+        return create_cell_order_2d(r_cut, dims)
+    if len(dims) == 3:
+        return create_cell_order_3d(r_cut, dims)
