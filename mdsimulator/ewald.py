@@ -1,15 +1,8 @@
 
-# coding: utf-8
-
-# In[5]:
-
 import numpy as np
 import numpy.linalg as npl
 import matplotlib.pyplot as plt
-get_ipython().magic('matplotlib inline')
 
-
-# In[6]:
 
 def getkvec(kmax,box):
     '''Returns an array with all vectors in k space obeying k_i<kmax'''
@@ -54,7 +47,8 @@ def longrange(pos,q,box,k_max,sigma,e_0):
     tmp = pre * np.exp(-sigma**2/2 * k2) / k2
     
     U   = np.sum(tmp * sk2)
-    F   = -np.sum((2 * tmp[:,na,na] * ((q[:,na] * np.imag(np.exp(-1j * np.einsum("ki,ji",k,pos)) * sk))                                  .T[:,na,:] * k[:,:,na])).T,axis=-1)
+    F   = -np.sum((2 * tmp[:,na,na] * ((q[:,na] * np.imag(np.exp(-1j * np.einsum("ki,ji",k,pos)) * sk))  
+                                       .T[:,na,:] * k[:,:,na])).T,axis=-1)
 
     return (U,F)
 
@@ -77,7 +71,6 @@ def selfenergy(pos,q,sigma,e_0):
     return E
 
 
-# In[ ]:
 
 
 
