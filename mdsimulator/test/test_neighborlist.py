@@ -103,8 +103,27 @@ def test_update_nl1D():
 
     nl = NeighborList(dim_box, pos, cell_width)
 
-    pos_new = np.array([[0.2], [0.3], [1.0], [1.8]])
+    reference_nl_head = np.array([1, 3])
+    reference_nl_list = np.array([-1, 0, -1, 2])
+
+    npt.assert_equal(nl.head, reference_nl_head)
+    npt.assert_equal(nl.list, reference_nl_list)
+    
+    pos_new = np.array([[0.2], [1.3], [0.1], [1.8]])
     nl.update(pos_new)
 
-    print("head", nl.head)
-    print()
+    reference_nl_head = np.array([2, 3])
+    reference_nl_list = np.array([-1, -1, 0, 1])
+
+    npt.assert_equal(nl.head, reference_nl_head)
+    npt.assert_equal(nl.list, reference_nl_list)
+    
+    nl.discard_update()
+
+    reference_nl_head = np.array([1, 3])
+    reference_nl_list = np.array([-1, 0, -1, 2])
+
+    npt.assert_equal(nl.head, reference_nl_head)
+    npt.assert_equal(nl.list, reference_nl_list)
+    
+    

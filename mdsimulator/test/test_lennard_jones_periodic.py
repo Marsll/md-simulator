@@ -1,6 +1,6 @@
 from ..lennard_jones_periodic import lennard_jones_forces, lennard_jones_potential, all_lennard_jones_forces, all_lennard_jones_potential, lennard_jones
 from ..neighbor_order_pbc import create_nb_order
-from .. neighbor_list import NeighborList
+from ..neighbor_list import NeighborList
 import numpy as np
 import numpy.testing as npt
 

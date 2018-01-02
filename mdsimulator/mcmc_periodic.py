@@ -32,7 +32,7 @@ def mcmc_step(ppos, box, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
     return ppos, epot, diff, nbs, nl
 
 
-def mcmc(ppos, box, r_cut, alpha=0.1, beta=1000, tol=1E-8, max_steps=1000, **kwargs):
+def mcmc(ppos, box, r_cut, alpha=0.1, beta=1000, tol=1E-8, max_steps=10, **kwargs):
     nl = NeighborList(box, ppos, r_cut)
     nbs = create_nb_order(box, r_cut)
     epot = all_lennard_jones_potential(ppos, nl, nbs, r_cut)
@@ -86,10 +86,10 @@ def plot_forces(ppos, forces):
 
 
 def test_mcmc():
-    """Three particles in a hard box."""
-    ppos = np.random.random([3, 3]) * 5
+    """Three particles in a periodic box."""
+    ppos = np.random.random([500, 3]) * 10
     plot_positions(ppos)
-    dim_box = (10, 10, 10)
+    dim_box = (10.2, 10.4, 17.4)
     finalppos, potential = mcmc(ppos, dim_box, r_cut=5)
     plot_positions(finalppos)
     #plt.show()

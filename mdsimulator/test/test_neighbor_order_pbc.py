@@ -2,7 +2,7 @@
 
 import numpy as np
 import numpy.testing as npt
-from ..neighbor_order_pbc import get_neighbors
+from ..neighbor_order_pbc import get_neighbors, create_nb_order
 
 
 def test_nb_order_pbc_2x2():
@@ -88,3 +88,11 @@ test_nb_order_pbc_2x2()
 test_nb_order_pbc_3x3()
 test_nb_order_pbc_4x4()
 test_nb_order_pbc_4x4x2()
+
+def test_nb_order_2x2x1():
+    nbs = create_nb_order((10, 10, 8), 5)
+    nbs_ref = [np.array([1,2,3]), np.array([2,3]), np.array([3]), np.array([])]
+    npt.assert_equal(nbs, nbs_ref)
+    
+test_nb_order_2x2x1()
+    

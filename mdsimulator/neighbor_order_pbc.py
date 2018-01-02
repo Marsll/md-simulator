@@ -29,7 +29,7 @@ def get_neighbors(cell_array):
     neighbors = np.stack(columns, axis=-1)
     # All neighbor pairs are accounted for twice, thus, we mask every
     # redudant occurence with -1
-    neighbors = np.where(neighbors >= neighbors[:, [0]], neighbors, -1)
+    neighbors = np.where(neighbors > neighbors[:, [0]], neighbors, -1)
     # First column stands for the cells themselves, discard it
     # Last row stands for neighbors of the last cell, these have all been
     # accounted for already, discard it
