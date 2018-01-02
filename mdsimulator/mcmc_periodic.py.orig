@@ -6,7 +6,12 @@ import scipy.spatial.distance as dist
 from lennard_jones_periodic import all_lennard_jones_potential
 from neighbor_order_pbc import create_nb_order
 
+<<<<<<< Updated upstream
 
+
+
+=======
+>>>>>>> Stashed changes
 def mcmc_step(ppos, box, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
               epot=None, **kwargs):
     if nl is None:
@@ -30,73 +35,73 @@ def mcmc_step(ppos, box, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
     return ppos, epot, diff, nbs, nl
 
 
-def mcmc(ppos, box, r_cut, alpha=0.1, beta=1000, tol=1E-8,
-         max_steps=10000, **kwargs):
+def mcmc(ppos, box, r_cut, alpha=0.1, beta=1000, tol=1E-8, max_steps=10, **kwargs):
     nl = NeighborList(box, ppos, r_cut)
     nbs = create_nb_order(box, r_cut)
-    epots = []
     epot = all_lennard_jones_potential(ppos, nl, nbs, r_cut)
-    epots.append(epot)
     diff = 1000
     count = 0
     while count < max_steps and diff >= tol:
         count += 1
         ppos, epot, diff, nbs, nl = mcmc_step(
             ppos, box, r_cut, nbs, nl, alpha, beta, epot)
-        epots.append(epot)
-    # print(count)
-    return ppos, epot, np.asarray(epots)
+        # print(potential,ppos)
+    #print(count)
+    return ppos, epot
 
 
 def back_map(ppos, box):
     for i, length in enumerate(box):
-        while any(ppos[:, i] >= length):
-            ppos.T[i][ppos[:, i] >= length] -= length
-        while any(ppos[:, i] < 0):
-            ppos.T[i][ppos[:, i] < 0] += length
+        while any(ppos[:,i] >= length):
+            ppos.T[i][ppos[:,i] >= length] -= length
+        while any(ppos[:,i] < 0):
+            ppos.T[i][ppos[:,i] < 0] += length
     return ppos
+
 
 
 def plot_positions(ppos):
     fig = plt.figure()
-    dims = ppos.shape[1]
+    box = ppos.shape[1]
 
-    if dims == 3:
+    if box == 3:
         ax = fig.gca(projection='3d')
         ax.scatter(*ppos.T, marker="o")
-    elif dims == 2:
+    elif box == 2:
         plt.scatter(*ppos.T, marker="o")
-    elif dims == 1:
+    elif box == 1:
         y = np.zeros(ppos.shape[0])
         plt.plot(*ppos.T, np.zeros_like(y), "o")
-
-
+        
 def plot_forces(ppos, forces):
     fig = plt.figure()
-    dims = ppos.shape[1]
+    box = ppos.shape[1]
 
-    if dims == 3:
+    if box == 3:
         ax = fig.gca(projection='3d')
         ax.quiver(*ppos.T, *forces.T, length=0.1, normalize=True)
-    elif dims == 2:
+    elif box == 2:
         plt.quiver(*ppos.T, *forces.T)
-    elif dims == 1:
+    elif box == 1:
         plt.quiver(*ppos.T, *forces.T)
 
 
 
 
 def test_mcmc():
-    """Particles in a periodic box."""
+    """Three particles in a periodic box."""
     ppos = np.random.random([500, 3]) * 10
     plot_positions(ppos)
     dim_box = (10.2, 10.4, 17.4)
-    finalppos, potential, _ = mcmc(ppos, dim_box, r_cut=5)
+    finalppos, potential = mcmc(ppos, dim_box, r_cut=5)
     plot_positions(finalppos)
-    # plt.show()
+    #plt.show()
     print(potential, finalppos)
 
 
+<<<<<<< Updated upstream
+test_mcmc()
+=======
 def mcmc_sampling():
     """Particles in a periodic box."""
     ppos = np.random.random([30, 3]) * 10
@@ -125,3 +130,4 @@ def boltzmann_distribution(e_min, e_max, beta, N):
 
 # test_mcmc()
 #mcmc_sampling()
+>>>>>>> Stashed changes

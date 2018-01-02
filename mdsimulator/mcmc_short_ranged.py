@@ -2,24 +2,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 from neighbor_list import NeighborList
-import scipy.spatial.distance as dist
-from lennard_jones_periodic import all_lennard_jones_potential
 from neighbor_order_pbc import create_nb_order
+from short_ranged import potentials, pbc
 
-
-def mcmc_step(ppos, box, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
+def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
               epot=None, **kwargs):
     if nl is None:
         nl = NeighborList(box, ppos, r_cut)
     if nbs is None:
         nbs = create_nb_order(box, r_cut)
     if epot is None:
-        epot = all_lennard_jones_potential(ppos, nl, nbs, r_cut)
+        epot = potentials(ppos, params, sigma_c, nl, nbs, r_cut)
 
     ppos_trial = ppos + alpha * (np.random.rand(*ppos.shape) - 0.5)
     ppos_trial = back_map(ppos_trial, nl.box)
     nl.update(ppos_trial, keep_old=True)
-    e_trial = all_lennard_jones_potential(ppos_trial, nl, nbs, r_cut)
+    e_trial = potentials(ppos, params, sigma_c, nl, nbs, r_cut)
 
     diff = 1000
 
@@ -30,19 +28,19 @@ def mcmc_step(ppos, box, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
     return ppos, epot, diff, nbs, nl
 
 
-def mcmc(ppos, box, r_cut, alpha=0.1, beta=1000, tol=1E-8,
+def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=1000000000000000, tol=1E-8,
          max_steps=10000, **kwargs):
     nl = NeighborList(box, ppos, r_cut)
     nbs = create_nb_order(box, r_cut)
     epots = []
-    epot = all_lennard_jones_potential(ppos, nl, nbs, r_cut)
+    epot = potentials(ppos, params, sigma_c, nl, nbs, r_cut)
     epots.append(epot)
     diff = 1000
     count = 0
     while count < max_steps and diff >= tol:
         count += 1
         ppos, epot, diff, nbs, nl = mcmc_step(
-            ppos, box, r_cut, nbs, nl, alpha, beta, epot)
+            ppos, params, sigma_c, box, r_cut, nbs, nl, alpha, beta, epot)
         epots.append(epot)
     # print(count)
     return ppos, epot, np.asarray(epots)
@@ -84,18 +82,19 @@ def plot_forces(ppos, forces):
         plt.quiver(*ppos.T, *forces.T)
 
 
-
-
 def test_mcmc():
     """Particles in a periodic box."""
-    ppos = np.random.random([500, 3]) * 10
+    #ppos = np.random.random([3, 3]) * 5
+    ppos = np.array([[0,0,0],[1,0,0]])
+    params = np.ones(ppos.shape)
+    params[1,0] = 1
+    sigma_c = 1
     plot_positions(ppos)
-    dim_box = (10.2, 10.4, 17.4)
-    finalppos, potential, _ = mcmc(ppos, dim_box, r_cut=5)
+    dim_box = (5, 5, 5)
+    finalppos, potential, _ = mcmc(ppos, params, sigma_c, dim_box, r_cut=5)
     plot_positions(finalppos)
     # plt.show()
-    print(potential, finalppos)
-
+    print(potential, np.linalg.norm(pbc(finalppos[0] - finalppos[1], dim_box)))
 
 def mcmc_sampling():
     """Particles in a periodic box."""
@@ -123,5 +122,5 @@ def boltzmann_distribution(e_min, e_max, beta, N):
     n_arr = N * np.exp(-beta * e_arr**2)
     return e_arr, n_arr
 
-# test_mcmc()
+test_mcmc()
 #mcmc_sampling()

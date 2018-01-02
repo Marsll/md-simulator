@@ -13,7 +13,8 @@ def lennard_jones_potential(r1, r2, box, r_cut=20, epsilon=1, sigma=1):
 
 def lennard_jones_forces(r1, r2, box, r_cut=10, epsilon=1, sigma=1):
     """Compute the lennard jones force between two particles.
-    The direction of the force is relative to particle 1 (r1)."""
+    The direction of the force is relative to particle 1 (r1).
+    The force acts on particle 1 (r1)."""
     dist = pbc(r1 - r2, box)
     r12 = np.linalg.norm(dist)
     force = 0
