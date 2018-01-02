@@ -2,7 +2,7 @@
 
 import numpy as np
 import numpy.testing as npt
-from ..neighbor_order_pbc import get_neighbors
+from ..neighbor_order_pbc import get_neighbors, create_nb_order
 
 
 def test_nb_order_pbc_2x2():
@@ -11,7 +11,7 @@ def test_nb_order_pbc_2x2():
     box = np.arange(total_n_cells)
     box = box.reshape(n_cells)
 
-    ref_nbs = [np.array([1, 2, 3]), np.array([2, 3]), np.array([3])]
+    ref_nbs = [np.array([1, 2, 3]), np.array([2, 3]), np.array([3]), np.array([])]
     nbs = get_neighbors(box)
     for arr_ref, arr in zip(ref_nbs, nbs):
         npt.assert_equal(arr_ref, arr)
@@ -30,7 +30,8 @@ def test_nb_order_pbc_3x3():
                np.array([5, 6, 7, 8]),
                np.array([6, 7, 8]),
                np.array([7, 8]),
-               np.array([8]), ]
+               np.array([8]),
+               np.array([])]
     nbs = get_neighbors(box)
     for arr_ref, arr in zip(ref_nbs, nbs):
         npt.assert_equal(arr_ref, np.sort(arr))
@@ -56,7 +57,8 @@ def test_nb_order_pbc_4x4():
                np.array([12, 14, 15]),
                np.array([13, 15]),
                np.array([14]),
-               np.array([15])]
+               np.array([15]),
+               np.array([])]
     nbs = get_neighbors(box)
     for arr_ref, arr in zip(ref_nbs, nbs):
         npt.assert_equal(arr_ref, np.sort(arr))
@@ -79,10 +81,18 @@ def test_nb_order_pbc_4x4x2():
     npt.assert_equal(ref_zero, nbs[0])
     npt.assert_equal(ref_12, nbs[12])
     npt.assert_equal(ref_26, nbs[26])
-    npt.assert_equal(ref_30, nbs[-1])
+    npt.assert_equal(ref_30, nbs[-2])
 
 
 test_nb_order_pbc_2x2()
 test_nb_order_pbc_3x3()
 test_nb_order_pbc_4x4()
 test_nb_order_pbc_4x4x2()
+
+def test_nb_order_2x2x1():
+    nbs = create_nb_order((10, 10, 8), 5)
+    nbs_ref = [np.array([1,2,3]), np.array([2,3]), np.array([3]), np.array([])]
+    npt.assert_equal(nbs, nbs_ref)
+    
+test_nb_order_2x2x1()
+    
