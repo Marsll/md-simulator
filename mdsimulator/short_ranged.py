@@ -102,7 +102,7 @@ def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     return forces
 
 
-def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
+def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=False, coulomb=True):
     """Compute the resulting Lennard Jones and Coulomb potential 
     of a certain distribution ppos using a neighbour list nl 
     and the neighbor order nbs"""

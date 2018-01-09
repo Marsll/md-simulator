@@ -17,9 +17,9 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, b
     ppos_trial = ppos + alpha * (np.random.rand(*ppos.shape) - 0.5)
     ppos_trial = back_map(ppos_trial, nl.box)
     nl.update(ppos_trial, keep_old=True)
-    e_trial = potentials(ppos, params, sigma_c, nl, nbs, r_cut)
+    e_trial = potentials(ppos_trial, params, sigma_c, nl, nbs, r_cut)
 
-    diff = 1000
+    diff = 1000 #fix!!!!!!
 
     if e_trial < epot or np.random.rand() < np.exp(beta * (epot - e_trial)):
         diff = np.absolute(epot - e_trial)
@@ -29,7 +29,7 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, b
 
 
 def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=1000000000000000, tol=1E-8,
-         max_steps=10000, **kwargs):
+         max_steps=100, **kwargs):
     nl = NeighborList(box, ppos, r_cut)
     nbs = create_nb_order(box, r_cut)
     epots = []
@@ -42,7 +42,6 @@ def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=1000000000000000, to
         ppos, epot, diff, nbs, nl = mcmc_step(
             ppos, params, sigma_c, box, r_cut, nbs, nl, alpha, beta, epot)
         epots.append(epot)
-    # print(count)
     return ppos, epot, np.asarray(epots)
 
 
@@ -85,7 +84,7 @@ def plot_forces(ppos, forces):
 def test_mcmc():
     """Particles in a periodic box."""
     #ppos = np.random.random([3, 3]) * 5
-    ppos = np.array([[0,0,0],[1,0,0]])
+    ppos = np.array([[0,0,0],[2,0,0],[3,2,1]])
     params = np.ones(ppos.shape)
     params[1,0] = 1
     sigma_c = 1
@@ -94,7 +93,9 @@ def test_mcmc():
     finalppos, potential, _ = mcmc(ppos, params, sigma_c, dim_box, r_cut=5)
     plot_positions(finalppos)
     # plt.show()
-    print(potential, np.linalg.norm(pbc(finalppos[0] - finalppos[1], dim_box)))
+    print(potential, np.linalg.norm(pbc(finalppos[0] - finalppos[1], dim_box)),
+          np.linalg.norm(pbc(finalppos[2] - finalppos[1], dim_box)),
+          np.linalg.norm(pbc(finalppos[0] - finalppos[2], dim_box)))
 
 def mcmc_sampling():
     """Particles in a periodic box."""
@@ -104,7 +105,7 @@ def mcmc_sampling():
     beta = 1
     finalppos, potential, epots = mcmc(
         ppos, dim_box, r_cut=5, alpha=.1,
-        beta=beta, max_steps=100000)
+        beta=beta, max_steps=10000)
     epots = epots[1000:]
     plt.hist(epots, bins='auto')
     e_arr, n_arr = boltzmann_distribution(np.min(epots), np.max(epots),

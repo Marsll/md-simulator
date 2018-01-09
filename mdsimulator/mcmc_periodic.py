@@ -105,7 +105,7 @@ def mcmc_sampling():
     beta = 1
     finalppos, potential, epots = mcmc(
         ppos, dim_box, r_cut=5, alpha=.1,
-        beta=beta, max_steps=100000)
+        beta=beta, max_steps=10000)
     epots = epots[1000:]
     plt.hist(epots, bins='auto')
     e_arr, n_arr = boltzmann_distribution(np.min(epots), np.max(epots),
