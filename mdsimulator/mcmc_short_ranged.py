@@ -37,7 +37,7 @@ def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=1000000000000000, to
     epots.append(epot)
     diff = 1000
     count = 0
-    while count < max_steps and diff >= tol:
+    while count < max_steps:# and diff >= tol:
         count += 1
         ppos, epot, diff, nbs, nl = mcmc_step(
             ppos, params, sigma_c, box, r_cut, nbs, nl, alpha, beta, epot)
@@ -99,12 +99,14 @@ def test_mcmc():
 
 def mcmc_sampling():
     """Particles in a periodic box."""
-    ppos = np.random.random([30, 3]) * 10
+    ppos = np.random.random([20, 3]) * 5
     # plot_positions(ppos)
     dim_box = (10, 10, 10)
-    beta = 1
-    finalppos, potential, epots = mcmc(
-        ppos, dim_box, r_cut=5, alpha=.1,
+    params = np.ones(ppos.shape)
+    beta = 10
+    sigma_c = 1
+    finalppos, potential, epots = mcmc(ppos, params, sigma_c, dim_box, r_cut=5,
+                                       alpha=.1,
         beta=beta, max_steps=10000)
     epots = epots[1000:]
     plt.hist(epots, bins='auto')
@@ -123,5 +125,5 @@ def boltzmann_distribution(e_min, e_max, beta, N):
     n_arr = N * np.exp(-beta * e_arr**2)
     return e_arr, n_arr
 
-test_mcmc()
-#mcmc_sampling()
+#test_mcmc()
+mcmc_sampling()
