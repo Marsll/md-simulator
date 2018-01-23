@@ -1,13 +1,9 @@
-
-import numpy as np
-import numpy.linalg as npl
-import matplotlib.pyplot as plt
-
-
 def getkvec(kmax,box):
     '''Returns an array with all vectors in k space obeying k_i<kmax'''
-    args=[np.arange(0,kmax)/box[i] for i in range(len(box))]
-    return 2*np.pi*np.array(np.meshgrid(*args)).T.reshape(-1,len(box))
+    args=[np.arange(-kmax,kmax+1) / box[i] for i in range(len(box))]
+    k_vecs=np.array(np.meshgrid(*args)).T.reshape(-1,len(box))
+    a=(2*np.pi*k_vecs[np.sqrt(np.sum(k_vecs**2,axis=1)) <=kmax ])
+    return a[np.sum(a,axis=1) != 0]
 
 def longrange(pos,q,box,k_max,sigma,e_0):
     '''
@@ -47,8 +43,8 @@ def longrange(pos,q,box,k_max,sigma,e_0):
     tmp = pre * np.exp(-sigma**2/2 * k2) / k2
     
     U   = np.sum(tmp * sk2)
-    F   = -np.sum((2 * tmp[:,na,na] * ((q[:,na] * np.imag(np.exp(-1j * np.einsum("ki,ji",k,pos)) * sk))  
-                                       .T[:,na,:] * k[:,:,na])).T,axis=-1)
+    F   = -np.sum((2 * tmp[:,na,na] * ((q[:,na] * np.imag(np.exp(-1j * np.einsum("ki,ji",k,pos)) * sk))\
+                                  .T[:,na,:] * k[:,:,na])).T,axis=-1)
 
     return (U,F)
 
@@ -69,8 +65,3 @@ def selfenergy(pos,q,sigma,e_0):
             ''' 
     E = np.sum(q**2) / (2  * e_0 * (2 * np.pi)**(3/2) * sigma) 
     return E
-
-
-
-
-
