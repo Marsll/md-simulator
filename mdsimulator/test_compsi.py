@@ -1,3 +1,9 @@
+"""test 16.1.18 Lenard jones
+512 particle
+e=sigma=1
+r_cut=3
+box=[20,20,20]"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
@@ -12,12 +18,12 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, b
     if nbs is None:
         nbs = create_nb_order(box, r_cut)
     if epot is None:
-        epot = potentials(ppos, params, sigma_c, nl, nbs, r_cut)
+        epot = potentials(ppos, params, sigma_c, nl, nbs, r_cut, coulomb=False)
 
     ppos_trial = ppos + alpha * (np.random.rand(*ppos.shape) - 0.5)
     ppos_trial = back_map(ppos_trial, nl.box)
     nl.update(ppos_trial, keep_old=True)
-    e_trial = potentials(ppos_trial, params, sigma_c, nl, nbs, r_cut)
+    e_trial = potentials(ppos_trial, params, sigma_c, nl, nbs, r_cut, coulomb=False)
 
     diff = 1000 #fix!!!!!!
 
@@ -30,11 +36,10 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, b
 
 def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=1000000000000000, tol=1E-8,
          max_steps=100, **kwargs):
-    ppos_array = [ppos]
     nl = NeighborList(box, ppos, r_cut)
     nbs = create_nb_order(box, r_cut)
     epots = []
-    epot = potentials(ppos, params, sigma_c, nl, nbs, r_cut)
+    epot = potentials(ppos, params, sigma_c, nl, nbs, r_cut, coulomb=False)
     epots.append(epot)
     diff = 1000
     count = 0
@@ -43,8 +48,7 @@ def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=1000000000000000, to
         ppos, epot, diff, nbs, nl = mcmc_step(
             ppos, params, sigma_c, box, r_cut, nbs, nl, alpha, beta, epot)
         epots.append(epot)
-        ppos_array.append([ppos])
-    return ppos, epot, np.asarray(epots), ppos_array
+    return ppos, epot, np.asarray(epots)
 
 
 def back_map(ppos, box):
@@ -54,7 +58,6 @@ def back_map(ppos, box):
         while any(ppos[:, i] < 0):
             ppos.T[i][ppos[:, i] < 0] += length
     return ppos
-
 
 def plot_positions(ppos):
     fig = plt.figure()
@@ -70,66 +73,39 @@ def plot_positions(ppos):
         plt.plot(*ppos.T, np.zeros_like(y), "o")
 
 
-def plot_forces(ppos, forces):
-    fig = plt.figure()
-    dims = ppos.shape[1]
-
-    if dims == 3:
-        ax = fig.gca(projection='3d')
-        ax.quiver(*ppos.T, *forces.T, length=0.1, normalize=True)
-    elif dims == 2:
-        plt.quiver(*ppos.T, *forces.T)
-    elif dims == 1:
-        plt.quiver(*ppos.T, *forces.T)
-
-
-def test_mcmc():
-    """Particles in a periodic box."""
-    #ppos = np.random.random([3, 3]) * 5
-    ppos = np.array([[0,0,0],[2,0,0],[3,2,1]])
-    params = np.ones(ppos.shape)
-    params[1,0] = 1
-    sigma_c = 1
-    plot_positions(ppos)
-    dim_box = (5, 5, 5)
-    finalppos, potential, _ = mcmc(ppos, params, sigma_c, dim_box, r_cut=5)
-    plot_positions(finalppos)
-    # plt.show()
-    print(potential, np.linalg.norm(pbc(finalppos[0] - finalppos[1], dim_box)),
-          np.linalg.norm(pbc(finalppos[2] - finalppos[1], dim_box)),
-          np.linalg.norm(pbc(finalppos[0] - finalppos[2], dim_box)))
-
 def mcmc_sampling():
     """Particles in a periodic box."""
-    N = 20
-    ppos = np.random.random([N, 3]) * 10
-    # plot_positions(ppos)
-    dim_box = (10, 10, 10)
+    dim_box = [20, 20, 20]
+    N = 64
+    ppos = create_uniform_dist(dim_box, N)
+    plot_positions(ppos)
+    plt.show()
+    r_cut = 3
+    #ppos = np.random.random([N, 3]) * 20
     params = np.ones(ppos.shape)
-    params[: int(N/2), 0]=-1
-    #print(params)
     beta = 1
     sigma_c = 1
-    finalppos, potential, epots,ppos_array = mcmc(ppos, params, sigma_c, dim_box, r_cut=3,
+    finalppos, potential, epots = mcmc(ppos, params, sigma_c, dim_box, r_cut,
                                        alpha=.5,
-        beta=beta, max_steps=100)
-    epots = epots[:100]
-    print(ppos_array)
+        beta=beta, max_steps=20000)
+    epots = epots[:]
     plt.hist(epots, bins='auto')
-    #e_arr, n_arr = boltzmann_distribution(np.min(epots), np.max(epots),
-     #beta, len(epots))
+    #e_arr, n_arr = boltzmann_distribution(np.min(epots), np.max(epots),beta, len(epots))
     #plt.plot(e_arr, n_arr)
-    plt.figure()
-    plt.plot(epots)
-    # plot_positions(finalppos)
+    #plt.figure()
+    #plt.plot(epots)
+    plot_positions(finalppos)
     plt.show()
     print(epots, finalppos)
     return epots
 
-def boltzmann_distribution(e_min, e_max, beta, N):
-    e_arr = np.linspace(e_min, e_max, 10000)
-    n_arr = N * np.exp(-beta * e_arr**2)
-    return e_arr, n_arr
+def create_uniform_dist(box, n):
+    # suppose cubic box
+    nx = np.ceil(n**(1/3))
+    xx = np.linspace(0, box[0], np.int(nx), endpoint=False)
+    grid = np.meshgrid(xx, xx, xx, indexing='xy')
+    grid = np.array(grid).T
+    grid = grid.reshape(n, len(box))
+    return np.array(grid)
 
-#test_mcmc()
 mcmc_sampling()

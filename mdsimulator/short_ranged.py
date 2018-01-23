@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.special import erfc
+from numba import jit
 
+@jit
 def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     """Compute the short ranged forces between two particles."""
     dist = pbc(r1 - r2, box)
@@ -22,7 +24,7 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     direction = dist / r12
     return force * direction
 
-
+@jit
 def pair_potential(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     """Compute the short ranged potential between two particles."""
     dist = pbc(r1 - r2, box)
@@ -40,6 +42,7 @@ def pair_potential(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=Tru
             potential += q1 * q2 / r12 * erfc(r12 / (np.sqrt(2) * sigma_c)) 
     return potential
 
+@jit
 def pair_interactions(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     """Compute the short ranged potential and forces between two particles."""
     dist = pbc(r1 - r2, box)
@@ -65,7 +68,7 @@ def pair_interactions(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=
     return potential, force * direction
     
     
-    
+@jit    
 def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     """Compute the resulting Lennard Jones and Colomb forces 
     of a certain distribution ppos using a neighbour list nl 
@@ -101,11 +104,16 @@ def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
             cell = nl.list[cell]
     return forces
 
-
+@jit
 def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     """Compute the resulting Lennard Jones and Coulomb potential 
     of a certain distribution ppos using a neighbour list nl 
-    and the neighbor order nbs"""
+    and the neighbor order nbs
+    params[0] = Ladungen
+    parmas[1] = epsilons lj
+    params[2] = sigma lj
+    """
+    
     
     potential = 0
     box = nl.box
@@ -133,7 +141,7 @@ def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
             cell = nl.list[cell]
     return potential
 
-
+@jit
 def interactions(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     """Compute the resulting lennard jones potential and forces of a 
     certain distribution ppos using the corresponding neighbour list nl 
@@ -172,7 +180,7 @@ def interactions(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
             cell = nl.list[cell]
     return forces, potential
 
-
+@jit
 def pbc(dist, box):
     #box (x-length, y-length, z-length) --> enumerate -> ((1,x-length),...)
     for i, length in enumerate(box):
