@@ -1,11 +1,16 @@
+import numpy as np
+import numpy.linalg as npl
+
+
 def getkvec(kmax,box):
     '''Returns an array with all vectors in k space obeying k_i<kmax'''
-    args=[np.arange(-kmax,kmax+1) / box[i] for i in range(len(box))]
+    args=[np.arange(-kmax,kmax+1)/box[i] for i in range(len(box))]
     k_vecs=np.array(np.meshgrid(*args)).T.reshape(-1,len(box))
-    a=(2*np.pi*k_vecs[np.sqrt(np.sum(k_vecs**2,axis=1)) <=kmax ])
-    return a[np.sum(a,axis=1) != 0]
+    a=(2*np.pi*k_vecs)#[np.sqrt(np.sum(k_vecs**2,axis=1)) <=kmax ]
+    return a[np.sum(a**2,axis=1) != 0]
 
-def longrange(pos,q,box,k_max,sigma,e_0):
+
+def longrange(pos,q,box,k_max,alpha,potential=True,forces=True):
     '''
     Reciprocal space component of Ewald summation.
     
@@ -15,7 +20,7 @@ def longrange(pos,q,box,k_max,sigma,e_0):
         q       (ndarray):      A n-dimensional numpy-array (charges)      
         box     (ndarray):      A d-dimensional numpy-array (size of preriodic box)
         k_max   (int):          A positive integer (reciprocal space cutoff)
-        sigma   (float):        A positive float (width of gaussian distribution)
+        alpha   (float):        A positive float (constant for division of comutation in real/reciproc space)
         e_0     (float):        A positive float (dielectric constant)
      
     Returns:
@@ -30,25 +35,24 @@ def longrange(pos,q,box,k_max,sigma,e_0):
     if box.shape[-1] != pos.shape[-1]:
         raise ValueError('Dimension missmatch: postions %iD, box %iD'%(pos.shape[-1],box.shape[-1]))
     
-    na=np.newaxis #reduces length of code drastically
-    
-    pre = 1/(np.prod(box)*e_0) 
-    
-    k   = getkvec(k_max,box)[1:] 
-    k2  = npl.norm(k,axis=1)**2
+    na=np.newaxis 
 
-    sk  = np.sum(q[:,na] * np.exp(1j * np.einsum("ki,ji",k,pos)),axis=0)
-    sk2 = np.abs(sk)**2
+    k     = getkvec(k_max,box)
+    k2    = npl.norm(k,axis=1)**2
+    pre   = 2*np.pi/np.prod(box)
+    tmp   = 1/k2*np.exp(- k2 /(alpha**2 * 4))    
+    sk    = np.sum(q[:,na]*np.exp(-1j*np.einsum('ki,ji',k,pos)),axis=0)
     
-    tmp = pre * np.exp(-sigma**2/2 * k2) / k2
+    if potential:
+        U = pre*np.sum(tmp*np.real(sk*sk.conj()))
+    if forces:
+        F = 2*pre*np.sum((tmp[na,:,na]*((q[:,na]*np.imag\
+              (sk*np.exp(1j*(np.einsum('ki,ji',k,pos)))))\
+                [:,:,na]*k[na,:,:])),axis=1)
     
-    U   = np.sum(tmp * sk2)
-    F   = -np.sum((2 * tmp[:,na,na] * ((q[:,na] * np.imag(np.exp(-1j * np.einsum("ki,ji",k,pos)) * sk))\
-                                  .T[:,na,:] * k[:,:,na])).T,axis=-1)
+    return U_L, F_L
 
-    return (U,F)
-
-def selfenergy(pos,q,sigma,e_0):
+def self_energy(q,alpha):
     '''
     Returns the self energy of a charge distribution .
     
@@ -63,5 +67,4 @@ def selfenergy(pos,q,sigma,e_0):
         E       (float):        A positive float (self energy of the charge distribution)
         
             ''' 
-    E = np.sum(q**2) / (2  * e_0 * (2 * np.pi)**(3/2) * sigma) 
-    return E
+    return -alpha/np.sqrt(np.pi)*np.sum(q**2)
