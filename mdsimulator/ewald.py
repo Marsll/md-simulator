@@ -50,7 +50,7 @@ def longrange(pos,q,box,k_max,alpha,potential=True,forces=True):
               (sk*np.exp(1j*(np.einsum('ki,ji',k,pos)))))\
                 [:,:,na]*k[na,:,:])),axis=1)
     
-    return U_L, F_L
+    return U, F
 
 def self_energy(q,alpha):
     '''
