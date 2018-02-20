@@ -14,7 +14,6 @@ def compute_distances(ppos, box):
 
 
 def pbc(dist, box):
-    print(dist.shape)
     for i, length in enumerate(box):
         while dist[i] >= 0.5 * length:
             dist[i] -= length
@@ -23,7 +22,7 @@ def pbc(dist, box):
     return dist
 
 
-def rdf(sample, box, num_bins=100):
+def rdf(sample, box, num_bins=50):
     n = len(sample)
     box = np.asarray(box)
     sample = np.asarray(sample)
@@ -33,8 +32,8 @@ def rdf(sample, box, num_bins=100):
         rs = compute_distances(pos_arr, box)
         hist, bins = np.histogram(rs, num_bins, r_range)
         hists.append(hist)
-    bins = bins[:-1]
+    bins = bins[1:]
     h = np.asarray(hists)
-    h / bins**2
+    h = h / bins**2
     rdf = np.sum(h, axis=0) / n
     return rdf, bins

@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
-from neighbor_list import NeighborList
-from neighbor_order_pbc import create_nb_order
-from short_ranged import potentials, pbc
-from rdf import rdf
+from .neighbor_list import NeighborList
+from .neighbor_order_pbc import create_nb_order
+from .short_ranged import potentials, pbc
+from .rdf import rdf
 
 
 def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
@@ -30,7 +30,7 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, b
     return ppos, epot, diff, nbs, nl
 
 
-def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=1000000000000000, tol=1E-8,
+def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=10000, tol=1E-8,
          max_steps=100, **kwargs):
     ppos_array = [ppos]
     nl = NeighborList(box, ppos, r_cut)
@@ -115,9 +115,9 @@ def mcmc_sampling():
     sigma_c = 1
     finalppos, potential, epots, ppos_array = mcmc(ppos, params, sigma_c, dim_box, r_cut=3,
                                                    alpha=.5,
-                                                   beta=beta, max_steps=10000)
+                                                   beta=beta, max_steps=100)
     #print(ppos_array[-1])
-    print(np.asarray(ppos_array[5000:]).shape)
+    print(np.asarray(ppos_array[1000:]).shape)
     plt.figure()
     histo_average, bins = rdf(ppos_array, dim_box)
     print(histo_average)
@@ -142,5 +142,4 @@ def boltzmann_distribution(e_min, e_max, beta, N):
     return e_arr, n_arr
 
 
-# test_mcmc()
-mcmc_sampling()
+
