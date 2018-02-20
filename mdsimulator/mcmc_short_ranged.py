@@ -30,7 +30,7 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, b
     return ppos, epot, diff, nbs, nl
 
 
-def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=1000000000000000, tol=1E-8,
+def mcmc(ppos, params, sigma_c, box, r_cut, alpha=0.1, beta=10000, tol=1E-8,
          max_steps=100, **kwargs):
     ppos_array = [ppos]
     nl = NeighborList(box, ppos, r_cut)
@@ -142,5 +142,4 @@ def boltzmann_distribution(e_min, e_max, beta, N):
     return e_arr, n_arr
 
 
-# test_mcmc()
-mcmc_sampling()
+
