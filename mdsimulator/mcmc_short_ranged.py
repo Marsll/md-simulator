@@ -117,7 +117,7 @@ def mcmc_sampling():
                                                    alpha=.5,
                                                    beta=beta, max_steps=100)
     #print(ppos_array[-1])
-    print(np.asarray(ppos_array[1000:]).shape)
+    #print(np.asarray(ppos_array[1000:]).shape)
     plt.figure()
     histo_average, bins = rdf(ppos_array, dim_box)
     print(histo_average)
