@@ -45,10 +45,15 @@ def longrange(pos,q,box,k_max,alpha,potential=True,forces=True):
     
     if potential:
         U = pre*np.sum(tmp*np.real(sk*sk.conj()))
+        if not forces:
+            return U
+    
     if forces:
         F = 2*pre*np.sum((tmp[na,:,na]*((q[:,na]*np.imag\
               (sk*np.exp(1j*(np.einsum('ki,ji',k,pos)))))\
                 [:,:,na]*k[na,:,:])),axis=1)
+        if not potential:
+            return F
     
     return U, F
 
