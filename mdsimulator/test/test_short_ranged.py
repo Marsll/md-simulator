@@ -1,8 +1,8 @@
 import numpy as np
-from short_ranged import potentials
-from neighbor_list import NeighborList
-from neighbor_order_pbc import create_nb_order
-#import matplotlib.pyplot as plt
+from ..short_ranged import potentials
+from ..neighbor_list import NeighborList
+from ..neighbor_order_pbc import create_nb_order
+import matplotlib.pyplot as plt
 import numpy.testing as npt
 from scipy.special import erfc
 

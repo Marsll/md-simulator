@@ -22,7 +22,7 @@ def pbc(dist, box):
     return dist
 
 
-def rdf(sample, box, num_bins=100):
+def rdf(sample, box, num_bins=50):
     n = len(sample)
     box = np.asarray(box)
     sample = np.asarray(sample)

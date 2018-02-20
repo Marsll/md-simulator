@@ -115,7 +115,7 @@ def mcmc_sampling():
     sigma_c = 1
     finalppos, potential, epots, ppos_array = mcmc(ppos, params, sigma_c, dim_box, r_cut=3,
                                                    alpha=.5,
-                                                   beta=beta, max_steps=10000)
+                                                   beta=beta, max_steps=100)
     #print(ppos_array[-1])
     print(np.asarray(ppos_array[1000:]).shape)
     plt.figure()
