@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
-from neighbor_list import NeighborList
-from neighbor_order_pbc import create_nb_order
-from short_ranged import potentials, pbc
-from rdf import rdf
+from .neighbor_list import NeighborList
+from .neighbor_order_pbc import create_nb_order
+from .short_ranged import potentials, pbc
+from .rdf import rdf
 
 
 def mcmc_step(ppos, params, sigma_c, box, r_cut, nbs=None, nl=None, alpha=0.1, beta=1000,
