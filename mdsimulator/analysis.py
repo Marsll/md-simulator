@@ -8,9 +8,8 @@ def plot_positions(ppos, *args):
     fig = plt.figure()
     dims = ppos.shape[1]
 
-    if charges in args:
-        np.unique(charges)
-        colors = cm.rainbow(np.linspace(0, 1, len()))
+   # if charges in args:
+    #    charge_values = np.unique(charges)
 
     if dims == 3:
         ax = fig.gca(projection='3d')

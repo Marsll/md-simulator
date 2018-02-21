@@ -2,13 +2,13 @@ from .neighbor_order_pbc import create_nb_order
 from .neighbor_list import NeighborList
 from .short_ranged import potentials
 from .ewald import longrange, self_energy
-from .mcmc_short_ranged import mcmc_step
+from .metropolis import mcmc_step
 
 
 class Optimizer:
 
-    def __init__(self, box, ppos, params, r_cut, sigma_c):
-        self.get_system(box, ppos, params, r_cut, sigma_c)
+    def __init__(self, box, ppos, params, r_cut, alpha, k_max):
+        self.get_system(box, ppos, params, r_cut, alpha, k_max)
         self.get_nb_order()
         self.get_neighbor_list()
         self.calc_energy()
@@ -23,12 +23,14 @@ class Optimizer:
             "storeppos": False
         }
 
-    def get_system(self, box, ppos, params, r_cut, sigma_c):
+    def get_system(self, box, ppos, params, r_cut, alpha, k_max):
         self.box = box
         self.params = params
         self.ppos = ppos
-        self.sigma_c = sigma_c
+        self.alpha = alpha
+        self.sigma_c = 1 / (2**(0.5) * alpha)
         self.r_cut = r_cut
+        self.k_max = k_max
 
     def get_nb_order(self):
         self.nbs = create_nb_order(self.box, self.r_cut)
@@ -39,10 +41,14 @@ class Optimizer:
     def calc_energy(self):
         self.e_short = potentials(self.ppos, self.params, self.sigma_c,
                                   self.nl, self.nbs, self.r_cut)
-        self.e_long = longrange(self.ppos, self.box, k_max=10, alpha=0.2, potential=True, forces=False)
-        self.e_self = self_energy(self.params[:, 0], alpha=0.2)
 
-        self.e = self.e_short + self.long + self.e_self
+        self.e_long = longrange(self.ppos, self.params[:, 0], self.box,
+                                self.k_max, self.alpha, potential=True,
+                                forces=False)
+
+        self.e_self = self_energy(self.params[:, 0], self.alpha)
+
+        self.e = self.e_short + self.e_long + self.e_self
 
     def set_run_options(self, **kwargs):
         for key in kwargs.keys():
@@ -55,7 +61,7 @@ class Optimizer:
         for _ in range(self.run_options["n_steps"]):
             self.ppos, self.e = mcmc_step(
                 self.ppos, self.params, self.sigma_c, self.box,
-                self.r_cut, self.nbs, self.nl, self.e,
+                self.r_cut, self.alpha, self.k_max, self.nbs, self.nl, self.e,
                 self.run_options["step_width"], self.run_options["beta"])
 
             self.epots.append(self.e)
