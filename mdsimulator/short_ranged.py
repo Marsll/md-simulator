@@ -40,7 +40,6 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
         if coulomb:
             q1 = par1[0]
             q2 = par2[0]
-            #Gaussian units!!!!!!!!!!!!!!!!!!!!!!!
             f1 = erfc(r12 / (np.sqrt(2) * sigma_c)) / r12 
             f2 = np.sqrt(2 / np.pi) / sigma_c * np.exp(- r12**2 / (2 * sigma_c**2))
             force += q1 * q2 / (4 * np.pi * eps * r12) * (f1 + f2)
