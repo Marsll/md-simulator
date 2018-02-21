@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.linalg as npl
-import scipy.constants as consts
+import scipy.constants as const
 
 eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
 
