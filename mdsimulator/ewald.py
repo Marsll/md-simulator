@@ -2,7 +2,7 @@ import numpy as np
 import numpy.linalg as npl
 import scipy.constants as const
 
-eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
+eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
 
 def getkvec(kmax,box):
     '''Returns an array with all vectors in k space obeying k_i<kmax'''

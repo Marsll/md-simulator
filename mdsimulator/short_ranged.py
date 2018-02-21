@@ -30,7 +30,7 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     dist = pbc(r1 - r2, box)
     r12 = np.linalg.norm(dist)
     force = 0
-
+    eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
@@ -40,6 +40,7 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
         if coulomb:
             q1 = par1[0]
             q2 = par2[0]
+            #Gaussian units!!!!!!!!!!!!!!!!!!!!!!!
             f1 = erfc(r12 / (np.sqrt(2) * sigma_c)) / r12 
             f2 = np.sqrt(2 / np.pi) / sigma_c * np.exp(- r12**2 / (2 * sigma_c**2))
             force += q1 * q2 / (4 * np.pi * eps * r12) * (f1 + f2)
@@ -69,6 +70,7 @@ def pair_potential(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=Tru
     dist = pbc(r1 - r2, box)
     r12 = np.linalg.norm(dist)
     potential = 0
+    eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
@@ -109,6 +111,7 @@ def pair_interactions(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=
     r12 = np.linalg.norm(dist)
     potential = 0
     force = 0
+    eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
@@ -180,7 +183,7 @@ def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     return forces
 
 @jit
-def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=False):
+def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     """Compute the resulting Lennard Jones and Coulomb potential 
     of a certain particle distribution using a neighbour lists.
     
