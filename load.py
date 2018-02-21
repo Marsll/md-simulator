@@ -41,7 +41,7 @@ k_max = 10
 # Specify options for the Markov Chain optimization
 
 # Number of steps in the chain
-n_steps = 100
+n_steps = 50
 
 # beta = 1/(kB * T)
 # high beta - low temperature - small chance to accept if energy higher
@@ -71,14 +71,11 @@ last_ppos = opt.get_ppos()
 
 
 plt.plot(epots)
-analysis.plot_positions(last_ppos)
+analysis.plot_positions(last_ppos, params[:, 0])
 plt.show()
 
-# print(box)
-# for r_cut in range(2, 10):
-#    r_cut = 6
 
-#print("total", opt.get_energy())
-#    print("long", opt.e_long)
-#    print("short", opt.e_short)
-#print("self", opt.e_self)
+print("total", opt.get_energy())
+print("long", opt.e_long)
+print("short", opt.e_short)
+print("self", opt.e_self)
