@@ -1,6 +1,8 @@
 import numpy as np
 import numpy.linalg as npl
+import scipy.constants as consts
 
+eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
 
 def getkvec(kmax,box):
     '''Returns an array with all vectors in k space obeying k_i<kmax'''
@@ -44,12 +46,12 @@ def longrange(pos,q,box,k_max,alpha,potential=True,forces=True):
     sk    = np.sum(q[:,na]*np.exp(-1j*np.einsum('ki,ji',k,pos)),axis=0)
     
     if potential:
-        U = pre*np.sum(tmp*np.real(sk*sk.conj()))
+        U = 1/(4*np.pi*eps)*pre*np.sum(tmp*np.real(sk*sk.conj()))
         if not forces:
             return U
     
     if forces:
-        F = 2*pre*np.sum((tmp[na,:,na]*((q[:,na]*np.imag\
+        F = 1/(4*np.pi*eps*1e-10)*2*pre*np.sum((tmp[na,:,na]*((q[:,na]*np.imag\
               (sk*np.exp(1j*(np.einsum('ki,ji',k,pos)))))\
                 [:,:,na]*k[na,:,:])),axis=1)
         if not potential:
@@ -72,4 +74,4 @@ def self_energy(q,alpha):
         E       (float):        A positive float (self energy of the charge distribution)
         
             ''' 
-    return -alpha/np.sqrt(np.pi)*np.sum(q**2)
+    return -1/(4*np.pi*eps)*alpha/np.sqrt(np.pi)*np.sum(q**2)
