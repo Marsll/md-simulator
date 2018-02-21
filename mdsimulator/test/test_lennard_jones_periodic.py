@@ -1,4 +1,5 @@
-#from ..lennard_jones_periodic import lennard_jones_forces, lennard_jones_potential, all_lennard_jones_forces, all_lennard_jones_potential, lennard_jones
+"""tests for short_ranged for the lennard jones forces and potential"""
+
 from ..neighbor_order_pbc import create_nb_order
 from ..neighbor_list import NeighborList
 from ..short_ranged import pair_potential, pair_force, potentials

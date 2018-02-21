@@ -1,3 +1,5 @@
+"""Tests for neighbor_list"""
+
 import numpy as np
 import numpy.testing as npt
 from ..neighbor_list import NeighborList

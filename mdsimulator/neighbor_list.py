@@ -1,6 +1,5 @@
 import numpy as np
-import numpy.testing as npt
-from .neighbor_order_pbc import get_n_cells #Punkt!
+from .neighbor_order_pbc import get_n_cells
 
 
 class NeighborList(object):
@@ -18,6 +17,12 @@ class NeighborList(object):
     """
 
     def __init__(self, box, ppos, cell_width):
+        """
+        Arguments:
+            ppos        (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles)   
+            box         (ndarray):      A one dimensional numpy-array with d elements  (size of preriodic box)
+            cell_width  (float):        Cell width
+        """
         self.box = np.atleast_1d(np.asarray(box))
 
         self.ppos = ppos

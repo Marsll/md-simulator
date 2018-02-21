@@ -3,6 +3,9 @@ from scipy.special import erfc
 import scipy.constants as const
 from numba import jit
 
+#Transform all units to
+eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
+
 @jit
 def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     """Compute the sum of the Lennard Jones force and the short ranged part 
@@ -10,24 +13,24 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     
     
     Arguments:
-        r1      (ndarray):      Position of the first particle
-        r2      (ndarray):      Position of the second particle       
-        par1    (ndarray):      Prameters of the first particle (charge, epsillon, sigma, mass)
-        par2    (ndarray):      Prameters of the second particle (charge, epsillon, sigma, mass)  
-        sigma_c (float):        Width of the gaussian distribution used to shield the particle
-        box     (ndarray):      A d-dimensional numpy-array (size of preriodic box)
-        r_cut   (float):        Cutoff radius
+        r1      (ndarray):      A one dimensional numpy-array with d elements (position of the first particle)
+        r2      (ndarray):      A one dimensional numpy-array with d elements (position of the second particle)       
+        par1    (ndarray):      A one dimensional numpy-array with 4 elements (charge, epsillon, sigma, mass) for the first particle 
+        par2    (ndarray):      A one dimensional numpy-array with 4 elements (charge, epsillon, sigma, mass) for the second particle  
+        sigma_c (float):        A positive float (width of the gaussian distribution used to shield the particle)
+        box     (ndarray):      A one dimensional numpy-array with d elements  (size of preriodic box)
+        r_cut   (float):        A positive float (cutoff radius)
         lj      (boolean):      If True the Lannard Jones force is calculated
         coulomb (boolean):      If True the Coulomb force is calculated
      
     Returns:
-        force * direction       (ndarray):      Force acting on the first particle due to the second one
+        force * direction       (ndarray):      A one dimensional numpy-array with d elements (force acting on the first particle)
         
     """
     dist = pbc(r1 - r2, box)
     r12 = np.linalg.norm(dist)
     force = 0
-    eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
+
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
@@ -37,7 +40,6 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
         if coulomb:
             q1 = par1[0]
             q2 = par2[0]
-            #Gaussian units!!!!!!!!!!!!!!!!!!!!!!!
             f1 = erfc(r12 / (np.sqrt(2) * sigma_c)) / r12 
             f2 = np.sqrt(2 / np.pi) / sigma_c * np.exp(- r12**2 / (2 * sigma_c**2))
             force += q1 * q2 / (4 * np.pi * eps * r12) * (f1 + f2)
@@ -51,23 +53,22 @@ def pair_potential(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=Tru
     
     
     Arguments:
-        r1      (ndarray):      Position of the first particle
-        r2      (ndarray):      Position of the second particle       
-        par1    (ndarray):      Prameters of the first particle (charge, epsillon, sigma, mass)
-        par2    (ndarray):      Prameters of the second particle (charge, epsillon, sigma, mass)  
-        sigma_c (float):        Width of the gaussian distribution used to shield the particle
-        box     (ndarray):      A d-dimensional numpy-array (size of preriodic box)
-        r_cut   (float):        Cutoff radius
+        r1      (ndarray):      A one dimensional numpy-array with d elements (position of the first particle)
+        r2      (ndarray):      A one dimensional numpy-array with d elements (position of the second particle)       
+        par1    (ndarray):      A one dimensional numpy-array with 4 elements (charge, epsillon, sigma, mass) for the first particle 
+        par2    (ndarray):      A one dimensional numpy-array with 4 elements (charge, epsillon, sigma, mass) for the second particle  
+        sigma_c (float):        A positive float (width of the gaussian distribution used to shield the particle)
+        box     (ndarray):      A one dimensional numpy-array with d elements  (size of preriodic box)
+        r_cut   (float):        A positive float (cutoff radius)
         lj      (boolean):      If True the Lannard Jones force is calculated
         coulomb (boolean):      If True the Coulomb force is calculated
      
     Returns:
-        potential       (float):     Potential fo the two particles 
+        potential       (float):     Float (potential of the two particles)
     """
     dist = pbc(r1 - r2, box)
     r12 = np.linalg.norm(dist)
     potential = 0
-    eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
@@ -88,38 +89,39 @@ def pair_interactions(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=
     
     
     Arguments:
-        r1      (ndarray):      Position of the first particle
-        r2      (ndarray):      Position of the second particle       
-        par1    (ndarray):      Prameters of the first particle (charge, epsillon, sigma, mass)
-        par2    (ndarray):      Prameters of the second particle (charge, epsillon, sigma, mass)  
-        sigma_c (float):        Width of the gaussian distribution used to shield the particle
-        box     (ndarray):      A d-dimensional numpy-array (size of preriodic box)
-        r_cut   (float):        Cutoff radius
+        r1      (ndarray):      A one dimensional numpy-array with d elements (position of the first particle)
+        r2      (ndarray):      A one dimensional numpy-array with d elements (position of the second particle)       
+        par1    (ndarray):      A one dimensional numpy-array with 4 elements (charge, epsillon, sigma, mass) for the first particle 
+        par2    (ndarray):      A one dimensional numpy-array with 4 elements (charge, epsillon, sigma, mass) for the second particle  
+        sigma_c (float):        A positive float (width of the gaussian distribution used to shield the particle)
+        box     (ndarray):      A one dimensional numpy-array with d elements  (size of preriodic box)
+        r_cut   (float):        A positive float (cutoff radius)
         lj      (boolean):      If True the Lannard Jones force is calculated
         coulomb (boolean):      If True the Coulomb force is calculated
+
      
     Returns:
-        potential               (float):        Potential fo the two particles 
-        force * direction       (ndarray):      Force acting on the first particle
+        potential               (float):        Float (potential of the two particles)
+        force * direction       (ndarray):      A one dimensional numpy-array with d elements (force acting on the first particle)
          
     """
     dist = pbc(r1 - r2, box)
     r12 = np.linalg.norm(dist)
     potential = 0
     force = 0
-    eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
             sigma_lj = calc_sig(par2[2], par2[2])
             rs = sigma_lj / r12
+            
             potential += 4 * epsilon * (rs**12 - rs**6)
             force += 24 * epsilon / r12 * (2 * rs**12 - rs**6)
         if coulomb:
             q1 = par1[0]
             q2 = par2[0]
             potential += q1 * q2 / (4 * np.pi * eps * r12) * erfc(r12 / (np.sqrt(2) * sigma_c))
-            #Gaussian units!!!!!!!!!!!!!!!!!!!!!!!
+
             f1 = erfc(r12 / (np.sqrt(2) * sigma_c)) / r12 
             f2 = np.sqrt(2 / np.pi) / sigma_c * np.exp(- r12**2 / (2 * sigma_c**2))
             force += q1 * q2 / (4 * np.pi * eps * r12) * (f1 + f2)
@@ -133,18 +135,17 @@ def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     of a certain particle distribution using a neighbour lists.
     
     Arguments:
-        ppos    (ndarray):      Positions of all particles    
-        params  (ndarray):      Prameters of all paricles (charge, epsillon, sigma, mass)
-        sigma_c (float):        Width of the gaussian distribution used to shield the particle
-        nl      (NeighborList): A d-dimensional numpy-array (size of preriodic box)
-        nbs     (list):         A d-dimensional numpy-array (size of preriodic box)
-        r_cut   (float):        Cutoff radius
+        ppos    (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles)   
+        params  (ndarray):      A two-dimensional array with shape (n,4) (charge, epsillon, sigma, mass) prameters of all paricles 
+        sigma_c (float):        A positive float (width of the gaussian distribution used to shield the particle)
+        nl      (NeighborList): A cell linked list
+        nbs     (list):         A list of n numpy arrays (which contain the neighbor cells of each cell)
+        r_cut   (float):        A positive float (cutoff radius)
         lj      (boolean):      If True the Lannard Jones force is calculated
         coulomb (boolean):      If True the Coulomb force is calculated
      
     Returns:
-        potential               (float):        Potential fo the two particles 
-        force * direction       (ndarray):      Force acting on the first particle
+        forces      (ndarray):       A two-dimensional array with shape (n,d) (Forces acting on each particle)
         
         """
     
@@ -179,13 +180,23 @@ def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     return forces
 
 @jit
-def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
+def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=False):
     """Compute the resulting Lennard Jones and Coulomb potential 
-    of a certain distribution ppos using a neighbour list nl 
-    and the neighbor order nbs
-    params[0] = Ladungen
-    parmas[1] = epsilons lj
-    params[2] = sigma lj
+    of a certain particle distribution using a neighbour lists.
+    
+    Arguments:
+        ppos    (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles)   
+        params  (ndarray):      A two-dimensional array with shape (n,4) (charge, epsillon, sigma, mass) prameters of all paricles 
+        sigma_c (float):        A positive float (width of the gaussian distribution used to shield the particle)
+        nl      (NeighborList): A cell linked list
+        nbs     (list):         A list of n numpy arrays (which contain the neighbor cells of each cell)
+        r_cut   (float):        A positive float (cutoff radius)
+        lj      (boolean):      If True the Lannard Jones force is calculated
+        coulomb (boolean):      If True the Coulomb force is calculated
+     
+    Returns:
+        potential               (float):        Potential of the whole system 
+
     """
     
     
@@ -217,9 +228,23 @@ def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
 
 @jit
 def interactions(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
-    """Compute the resulting lennard jones potential and forces of a 
-    certain distribution ppos using the corresponding neighbour list nl 
-    and cell order nbs."""
+    """Compute the resulting Lennard Jones and Coulomb forces and potential 
+    of a certain particle distribution using a neighbour lists.
+    
+    Arguments:
+        ppos    (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles)   
+        params  (ndarray):      A two-dimensional array with shape (n,4) (charge, epsillon, sigma, mass) prameters of all paricles 
+        sigma_c (float):        A positive float (width of the gaussian distribution used to shield the particle)
+        nl      (NeighborList): A cell linked list
+        nbs     (list):         A list of n numpy arrays (which contain the neighbor cells of each cell)
+        r_cut   (float):        A positive float (cutoff radius)
+        lj      (boolean):      If True the Lannard Jones force is calculated
+        coulomb (boolean):      If True the Coulomb force is calculated
+     
+    Returns:
+        potential   (float):        Potential of the whole system
+        forces      (ndarray):      A two-dimensional array with shape (n,d) (Forces acting on each particle)
+    """
     box = nl.box
     forces = np.zeros((ppos.shape))
     potential = 0
@@ -256,6 +281,17 @@ def interactions(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
 
 @jit
 def pbc(dist, box):
+    """Periodic boundary conditions. Retruns the shortest distance vector.
+        
+    Arguments:
+        dist    (ndarray):      numpy array of size d (distance vector between two particles in the box)    
+        box     (ndarray):      A one dimensional numpy-array with d elements  (size of preriodic box)
+
+     
+    Returns:
+        dist    (ndarray):      numpy array of size d (shortest vector between two particle using periodic boundary conditions)
+    
+    """
     #box (x-length, y-length, z-length) --> enumerate -> ((1,x-length),...)
     for i, length in enumerate(box):
         while dist[i] >= 0.5 * length:

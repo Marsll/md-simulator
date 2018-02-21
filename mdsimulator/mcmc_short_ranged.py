@@ -104,8 +104,10 @@ def test_mcmc():
 
 def mcmc_sampling():
     """Particles in a periodic box."""
-    N = 64
-    ppos = np.random.random([N, 3]) * 10
+    N = 100
+    x = np.linspace(0,8,5)
+    xx, yy, zz = np.meshgrid(x,x,x)
+    ppos = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
     # plot_positions(ppos)
     dim_box = (10, 10, 10)
     params = np.ones(ppos.shape)
@@ -115,12 +117,13 @@ def mcmc_sampling():
     sigma_c = 1
     finalppos, potential, epots, ppos_array = mcmc(ppos, params, sigma_c, dim_box, r_cut=3,
                                                    alpha=.5,
-                                                   beta=beta, max_steps=100)
+                                                   beta=beta, max_steps=1000)
     #print(ppos_array[-1])
     #print(np.asarray(ppos_array[1000:]).shape)
     plt.figure()
     histo_average, bins = rdf(ppos_array, dim_box)
     print(histo_average)
+    print(2)
     plt.plot(bins, histo_average)
     #epots = epots[:100]
     #print(ppos_array)
