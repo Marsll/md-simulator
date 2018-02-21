@@ -8,6 +8,15 @@ from .metropolis import mcmc_step
 class Optimizer:
 
     def __init__(self, box, ppos, params, r_cut, alpha, k_max):
+        """
+        Arguments:
+            box         (ndarray):      A one dimensional numpy-array with d elements (size of preriodic box)
+            ppos        (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles)   
+            params      (ndarray):      A two-dimensional array with shape (n,4) (charge, epsillon, sigma, mass) prameters of all paricles 
+            r_cut       (float):        A positive float (cutoff radius in real space)
+            alpha       (float):        A positive float (standard deviation for Gaussian charge distribution in Ewald summation)
+            k_max       (float):        A positive float (cutoff radius in k space)
+        """
         self.get_system(box, ppos, params, r_cut, alpha, k_max)
         self.get_nb_order()
         self.get_neighbor_list()
@@ -59,11 +68,13 @@ class Optimizer:
 
     def run(self):
         for _ in range(self.run_options["n_steps"]):
-            self.ppos, self.e = mcmc_step(
+            self.ppos, self.e_short, self.e_long = mcmc_step(
                 self.ppos, self.params, self.sigma_c, self.box,
-                self.r_cut, self.alpha, self.k_max, self.nbs, self.nl, self.e,
+                self.r_cut, self.alpha, self.k_max, self.nbs, self.nl,
+                self.e_short, self.e_long,
                 self.run_options["step_width"], self.run_options["beta"])
-
+            
+            self.e = self.e_short + self.e_long + self.e_self
             self.epots.append(self.e)
 
             if self.run_options["storeppos"]:
@@ -71,7 +82,16 @@ class Optimizer:
 
     def get_energy(self):
         return self.e
-
+    
+    def get_energy_short(self):
+        return self.e_short
+    
+    def get_energy_long(self):
+        return self.e_long
+    
+    def get_energy_self(self):
+        return self.e_self
+    
     def get_ppos(self):
         return self.ppos
 

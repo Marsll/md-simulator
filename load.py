@@ -13,6 +13,18 @@ with np.load('sodium-chloride-example.npz') as fh:
     types = fh['types']
     parameters = fh['parameters'].item()
 
+
+#new grid test positions, which should be nearly optimal
+x = np.linspace(0, box[0], 4, endpoint=False)
+xx, yy, zz = np.meshgrid(x,x,x)
+positions1 = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
+
+x = np.linspace(0 + box[0] / 8, box[0] + box[0] / 8, 4, endpoint=False)
+xx, yy, zz = np.meshgrid(x,x,x)
+positions2 = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
+positions = np.concatenate((positions1, positions2), axis=0)
+
+
 # q, epsilon, sigma, m
 params = np.empty([len(positions), 4])
 
@@ -41,12 +53,12 @@ k_max = 10
 # Specify options for the Markov Chain optimization
 
 # Number of steps in the chain
-n_steps = 50
+n_steps = 1000
 
 # beta = 1/(kB * T)
 # high beta - low temperature - small chance to accept if energy higher
 # low beta - high temperature - high chance to accept even if energy higher
-beta = 1000
+beta = 100
 
 # Scaling factor for displacement of each particle in one Markov chain step
 step_width = 0.1
@@ -76,6 +88,6 @@ plt.show()
 
 
 print("total", opt.get_energy())
-print("long", opt.e_long)
-print("short", opt.e_short)
-print("self", opt.e_self)
+print("long", opt.get_energy_long())
+print("short", opt.get_energy_short())
+print("self", opt.get_energy_self())
