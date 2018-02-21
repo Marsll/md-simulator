@@ -27,7 +27,7 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     dist = pbc(r1 - r2, box)
     r12 = np.linalg.norm(dist)
     force = 0
-    eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
+    eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
@@ -67,7 +67,7 @@ def pair_potential(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=Tru
     dist = pbc(r1 - r2, box)
     r12 = np.linalg.norm(dist)
     potential = 0
-    eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
+    eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
@@ -107,7 +107,7 @@ def pair_interactions(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=
     r12 = np.linalg.norm(dist)
     potential = 0
     force = 0
-    eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
+    eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
     if r12 <= r_cut:
         if lj:
             epsilon = calc_eps(par1[1], par2[1])
