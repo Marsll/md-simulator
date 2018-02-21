@@ -2,6 +2,7 @@ import numpy as np
 from scipy.special import erfc
 from numba import jit
 
+
 @jit
 def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
     """Compute the short ranged forces between two particles."""
@@ -17,12 +18,14 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
         if coulomb:
             q1 = par1[0]
             q2 = par2[0]
-            #Gaussian units!!!!!!!!!!!!!!!!!!!!!!!
-            f1 = erfc(r12 / (np.sqrt(2) * sigma_c)) / r12 
-            f2 = np.sqrt(2 / np.pi) / sigma_c * np.exp(- r12**2 / (2 * sigma_c**2))
+            # Gaussian units!!!!!!!!!!!!!!!!!!!!!!!
+            f1 = erfc(r12 / (np.sqrt(2) * sigma_c)) / r12
+            f2 = np.sqrt(2 / np.pi) / sigma_c * \
+                np.exp(- r12**2 / (2 * sigma_c**2))
             force += q1 * q2 / r12 * (f1 + f2)
     direction = dist / r12
     return force * direction
+
 
 @jit
 def pair_potential(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
@@ -39,8 +42,9 @@ def pair_potential(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=Tru
         if coulomb:
             q1 = par1[0]
             q2 = par2[0]
-            potential += q1 * q2 / r12 * erfc(r12 / (np.sqrt(2) * sigma_c)) 
+            potential += q1 * q2 / r12 * erfc(r12 / (np.sqrt(2) * sigma_c))
     return potential
+
 
 @jit
 def pair_interactions(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
@@ -60,20 +64,21 @@ def pair_interactions(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=
             q1 = par1[0]
             q2 = par2[0]
             potential += q1 * q2 / r12 * erfc(r12 / (np.sqrt(2) * sigma_c))
-            #Gaussian units!!!!!!!!!!!!!!!!!!!!!!!
-            f1 = erfc(r12 / (np.sqrt(2) * sigma_c)) / r12 
-            f2 = np.sqrt(2 / np.pi) / sigma_c * np.exp(- r12**2 / (2 * sigma_c**2))
+            # Gaussian units!!!!!!!!!!!!!!!!!!!!!!!
+            f1 = erfc(r12 / (np.sqrt(2) * sigma_c)) / r12
+            f2 = np.sqrt(2 / np.pi) / sigma_c * \
+                np.exp(- r12**2 / (2 * sigma_c**2))
             force += q1 * q2 / r12 * (f1 + f2)
     direction = dist / r12
     return potential, force * direction
-    
-    
-@jit    
+
+
+@jit
 def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     """Compute the resulting Lennard Jones and Colomb forces 
     of a certain distribution ppos using a neighbour list nl 
     and the neighbor order nbs"""
-    
+
     box = nl.box
     forces = np.zeros((ppos.shape))
     for i, cell in enumerate(nl.head):
@@ -85,7 +90,7 @@ def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
                     ppos[cell], ppos[next_cell],
                     params[cell], params[next_cell],
                     sigma_c, box, r_cut, lj, coulomb)
-                
+
                 forces[cell] += force
                 forces[next_cell] -= force
                 next_cell = nl.list[next_cell]
@@ -94,15 +99,16 @@ def forces(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
                 next_nbcell = nl.head[nb]
                 while next_nbcell != -1:
                     force = pair_force(
-                            ppos[cell], ppos[next_nbcell], 
-                            params[cell], params[next_nbcell],
-                            sigma_c, box, r_cut, lj, coulomb)
-                    
+                        ppos[cell], ppos[next_nbcell],
+                        params[cell], params[next_nbcell],
+                        sigma_c, box, r_cut, lj, coulomb)
+
                     forces[cell] += force
                     forces[next_nbcell] -= force
                     next_nbcell = nl.list[next_nbcell]
             cell = nl.list[cell]
     return forces
+
 
 @jit
 def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
@@ -113,8 +119,7 @@ def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
     parmas[1] = epsilons lj
     params[2] = sigma lj
     """
-    
-    
+
     potential = 0
     box = nl.box
     for i, cell in enumerate(nl.head):
@@ -126,7 +131,7 @@ def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
                     ppos[cell], ppos[next_cell],
                     params[cell], params[next_cell],
                     sigma_c, box, r_cut, lj, coulomb)
-                
+
                 next_cell = nl.list[next_cell]
             # neighbour cells
             for nb in nbs[i]:
@@ -136,10 +141,11 @@ def potentials(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
                         ppos[cell], ppos[next_nbcell],
                         params[cell], params[next_nbcell],
                         sigma_c, box, r_cut, lj, coulomb)
-                    
+
                     next_nbcell = nl.list[next_nbcell]
             cell = nl.list[cell]
     return potential
+
 
 @jit
 def interactions(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
@@ -158,7 +164,7 @@ def interactions(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
                     ppos[cell], ppos[next_cell],
                     params[cell], params[next_cell],
                     sigma_c, box, r_cut, lj, coulomb)
-                
+
                 forces[cell] += force
                 forces[next_cell] -= force
                 next_cell = nl.list[next_cell]
@@ -172,7 +178,7 @@ def interactions(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
                         ppos[cell], ppos[next_nbcell],
                         params[cell], params[next_nbcell],
                         sigma_c, box, r_cut, lj, coulomb)
-                    
+
                     forces[cell] += force
                     forces[next_nbcell] -= force
                     potential += pot
@@ -180,9 +186,9 @@ def interactions(ppos, params, sigma_c, nl, nbs, r_cut, lj=True, coulomb=True):
             cell = nl.list[cell]
     return forces, potential
 
+
 @jit
 def pbc(dist, box):
-    #box (x-length, y-length, z-length) --> enumerate -> ((1,x-length),...)
     for i, length in enumerate(box):
         while dist[i] >= 0.5 * length:
             dist[i] -= length
@@ -190,9 +196,11 @@ def pbc(dist, box):
             dist[i] += length
     return dist
 
+
 def calc_eps(e1, e2):
     """Returns the Lenard Jones epsillon of two particles."""
     return np.sqrt(e1 * e2)
+
 
 def calc_sig(s1, s2):
     """Returns the Lenard Jones sigma of two particles."""

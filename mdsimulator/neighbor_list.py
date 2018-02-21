@@ -1,17 +1,17 @@
 import numpy as np
 import numpy.testing as npt
-from .neighbor_order_pbc import get_n_cells #Punkt!
+from .neighbor_order_pbc import get_n_cells
 
 
 class NeighborList(object):
     """ Cell linked list implementation.
 
     The simulation box is partioned in cells of equal size.
-    head contains a "starting" pointer to a particle in list.
-    Every element in head stands for one particular cell
-    In list the particles that correspond to the cell point to
+    self.head contains a "starting" pointer to a particle in self.list.
+    Every element in self.head stands for one particular cell
+    In self.list the particles that correspond to the cell point to
     each other - they are linked - until there are no more.
-    Then the last pointer is simply -1.P
+    Then the last pointer is simply -1.
     ToDo:
     - Edge cases: particles cannot be on the edges of the box
         in particular the right and upper edge
@@ -70,9 +70,3 @@ class NeighborList(object):
             cell_index += indexes[i] * np.prod(self.n_cells[i + 1:])
 
         return cell_index.astype(np.int)
-
-
-'''
-        for i in range(dims - 1, -1, -1):
-            cell_index += indexes[i] * np.prod(self.n_cells[:i])
-'''
