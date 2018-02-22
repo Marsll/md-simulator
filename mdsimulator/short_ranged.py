@@ -294,7 +294,6 @@ def pbc(dist, box):
         dist    (ndarray):      numpy array of size d (shortest vector between two particle using periodic boundary conditions)
     
     """
-    #box (x-length, y-length, z-length) --> enumerate -> ((1,x-length),...)
     for i, length in enumerate(box):
         while dist[i] >= 0.5 * length:
             dist[i] -= length

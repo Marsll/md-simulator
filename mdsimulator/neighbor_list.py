@@ -6,14 +6,11 @@ class NeighborList(object):
     """ Cell linked list implementation.
 
     The simulation box is partioned in cells of equal size.
-    head contains a "starting" pointer to a particle in list.
-    Every element in head stands for one particular cell
-    In list the particles that correspond to the cell point to
+    self.head contains a "starting" pointer to a particle in self.list.
+    Every element in self.head stands for one particular cell
+    In self.list the particles that correspond to the cell point to
     each other - they are linked - until there are no more.
-    Then the last pointer is simply -1.P
-    ToDo:
-    - Edge cases: particles cannot be on the edges of the box
-        in particular the right and upper edge
+    Then the last pointer is simply -1.
     """
 
     def __init__(self, box, ppos, cell_width):
@@ -76,8 +73,3 @@ class NeighborList(object):
 
         return cell_index.astype(np.int)
 
-
-'''
-        for i in range(dims - 1, -1, -1):
-            cell_index += indexes[i] * np.prod(self.n_cells[:i])
-'''
