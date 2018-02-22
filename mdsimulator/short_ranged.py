@@ -4,7 +4,7 @@ import scipy.constants as const
 from numba import jit
 
 #Transform all units to
-eps=const.epsilon_0*1e-20*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
+eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
 
 @jit
 def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):

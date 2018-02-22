@@ -6,6 +6,9 @@ from ..neighbor_list import NeighborList
 from ..neighbor_order_pbc import create_nb_order
 import numpy.testing as npt
 from scipy.special import erfc
+import scipy.constants as const
+
+eps=const.epsilon_0*1e-10*const.e**-2*1e6*const.physical_constants['Avogadro constant'][0]**-1
 
 
 def test_potential_shape():
@@ -30,7 +33,7 @@ def test_potential_shape():
         rs[count] = np.linalg.norm(ppos[0, 0] - ppos[1, 0])
         epots[count] = potentials(ppos, params, sigma_c, nl, nbs, r_cut)
         
-        epots_ref[count] = 4 * ((1 / r)**12 - (1 / r)**6) +  1 / r * erfc(r / (np.sqrt(2)))  
+        epots_ref[count] = 4 * ((1 / r)**12 - (1 / r)**6) +  1 / (4 * np.pi * eps * r) * erfc(r / (np.sqrt(2)))  
         
         count += 1
         r += 10. / n
