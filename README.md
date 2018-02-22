@@ -1,5 +1,5 @@
 # md-simulator
-An implementation of the Particle Mesh Ewald (PME) method to simulate systems of charged particles.
+An implementation of the Ewald summation method to simulate systems of charged particles.
 
 ## Installation
 To install the package on your machine, first clone it
