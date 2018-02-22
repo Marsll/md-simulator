@@ -43,7 +43,7 @@ k_max = 10
 # Specify options for the Markov Chain optimization
 
 # Number of steps in the chain
-n_steps = 10
+n_steps = 1000
 
 # beta = 1/(kB * T)
 # high beta - low temperature - small chance to accept if energy higher
@@ -65,14 +65,15 @@ opt.set_run_options(n_steps=n_steps, temperature=temperature,
 ############################################################################
 # Run the optimization and obtain energies and positions
 opt.run()
-el1, el2, histo1, histo2, bins = rdf.rdf_fast_unique(np.asarray(opt.get_ppos_series()), types, box)
+el1, el2, histo1, histo2, bins = rdf.rdf_unique(
+        np.asarray(opt.get_ppos_series()), types, box)
 analysis.plot_rdfs(histo1, histo2, bins, el1, el2)
 
 
 epots = opt.get_total_energies()
 e_shorts = opt.get_short_energies()
 e_longs = opt.get_long_energies()
-e_selfs = np.zeros(n_steps) + opt.get_energy_self()
+e_selfs = np.zeros(len(epots)) + opt.get_energy_self()
 ppos_series = opt.get_ppos_series()
 last_ppos = opt.get_ppos()
 
@@ -87,30 +88,38 @@ analysis.plot_positions(last_ppos, params[:, 0])
 # Set up charges on a perfect grid and optimize
 # Noise parameter displaces them from the perfect grid
 
-# noise = 1.0
-# ppos_grid = analysis.grid_positions(types, box, noise)
-
-# opt_grid = Optimizer(box, ppos_grid, params, r_cut, alpha, k_max)
-# opt_grid.set_run_options(n_steps=500, temperature=300,
+#noise = 0.0
+#ppos_grid = analysis.grid_positions(types, box, noise)
+#
+#opt_grid = Optimizer(box, ppos_grid, params, r_cut, alpha, k_max)
+#opt_grid.set_run_options(n_steps=100, temperature=300,
 #                          step_width=0.3, storeppos=storeppos)
-# opt_grid.run()
-
-# epots_grid = opt_grid.get_total_energies()
-# e_shorts_grid = opt_grid.get_short_energies()
-# e_longs_grid = opt_grid.get_long_energies()
-# e_selfs_grid = np.zeros(len(epots_grid)) + opt.get_energy_self()
-# ppos_series_grid = opt_grid.get_ppos_series()
-# last_ppos_grid = opt_grid.get_ppos()
-
-
-# analysis.plot_energies((epots_grid, "total"), (e_longs_grid, "long"),
+#opt_grid.run()
+#
+#epots_grid = opt_grid.get_total_energies()
+#e_shorts_grid = opt_grid.get_short_energies()
+#e_longs_grid = opt_grid.get_long_energies()
+#e_selfs_grid = np.zeros(len(epots_grid)) + opt.get_energy_self()
+#ppos_series_grid = opt_grid.get_ppos_series()
+#last_ppos_grid = opt_grid.get_ppos()
+#
+#
+#analysis.plot_energies((epots_grid, "total"), (e_longs_grid, "long"),
 #                        (e_shorts_grid, "short"), (e_selfs_grid, "self"))
+#
+#plt.figure()
+#plt.title("Distribution of energies")
+#plt.hist(epots_grid, bins=30)
+#
+#analysis.plot_positions(last_ppos_grid, params[:, 0])
 
-# plt.figure()
-# plt.title("Distribution of energies")
-# plt.hist(epots_grid, bins=30)
 
-# analysis.plot_positions(last_ppos_grid, params[:, 0])
+
+
+
+
+
+
 
 
 
