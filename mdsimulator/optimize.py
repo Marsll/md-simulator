@@ -23,6 +23,8 @@ class Optimizer:
         self.calc_energy()
 
         self.epots = [self.e]
+        self.e_shorts = [self.e_short]
+        self.e_longs = [self.e_long]
         self.ppos_arr = [self.ppos]
 
         self.run_options = {
@@ -73,7 +75,10 @@ class Optimizer:
                 self.r_cut, self.alpha, self.k_max, self.nbs, self.nl,
                 self.e_short, self.e_long,
                 self.run_options["step_width"], self.run_options["beta"])
-            
+
+            self.e_shorts.append(self.e_short)
+            self.e_longs.append(self.e_long)
+
             self.e = self.e_short + self.e_long + self.e_self
             self.epots.append(self.e)
 
@@ -82,21 +87,27 @@ class Optimizer:
 
     def get_energy(self):
         return self.e
-    
+
     def get_energy_short(self):
         return self.e_short
-    
+
     def get_energy_long(self):
         return self.e_long
-    
+
     def get_energy_self(self):
         return self.e_self
-    
+
     def get_ppos(self):
         return self.ppos
 
-    def get_energies(self):
+    def get_total_energies(self):
         return self.epots
+
+    def get_short_energies(self):
+        return self.e_shorts
+
+    def get_long_energies(self):
+        return self.e_longs
 
     def get_ppos_series(self):
         return self.ppos

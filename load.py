@@ -13,8 +13,8 @@ with np.load('sodium-chloride-example.npz') as fh:
     types = fh['types']
     parameters = fh['parameters'].item()
 
-
-#new grid test positions, which should be nearly optimal
+'''
+# new grid test positions, which should be nearly optimal
 x = np.linspace(0, box[0], 4, endpoint=False)
 xx, yy, zz = np.meshgrid(x,x,x)
 positions1 = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
@@ -23,6 +23,7 @@ x = np.linspace(0 + box[0] / 8, box[0] + box[0] / 8, 4, endpoint=False)
 xx, yy, zz = np.meshgrid(x,x,x)
 positions2 = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
 positions = np.concatenate((positions1, positions2), axis=0)
+'''
 
 
 # q, epsilon, sigma, m
@@ -53,7 +54,7 @@ k_max = 10
 # Specify options for the Markov Chain optimization
 
 # Number of steps in the chain
-n_steps = 1000
+n_steps = 10
 
 # beta = 1/(kB * T)
 # high beta - low temperature - small chance to accept if energy higher
@@ -77,17 +78,23 @@ opt.set_run_options(n_steps=n_steps, beta=beta,
 opt.run()
 
 
-epots = opt.get_energies()
+epots = opt.get_total_energies()
+e_shorts = opt.get_short_energies()
+e_longs = opt.get_long_energies()
+e_selfs = np.zeros(len(e_longs)) + opt.get_energy_self()
 ppos_series = opt.get_ppos_series()
 last_ppos = opt.get_ppos()
 
 
-plt.plot(epots)
-analysis.plot_positions(last_ppos, params[:, 0])
+plt.plot(epots, label="total")
+plt.plot(e_shorts, label="short")
+plt.plot(e_longs, label="long")
+plt.plot(e_selfs, label="self")
+plt.legend()
+
+# analysis.plot_positions(last_ppos, params[:, 0])
 plt.show()
 
 
-print("total", opt.get_energy())
-print("long", opt.get_energy_long())
-print("short", opt.get_energy_short())
-print("self", opt.get_energy_self())
+# analysis.plot_positions(positions, params[:, 0])
+# plt.show()
