@@ -40,7 +40,7 @@ def test_force_3d():
     par1 = np.ones(3)
     par2 = np.ones(3)
     sigma_c = 1
-    force = pair_force(pos1, pos2, par1 ,par2 ,sigma_c, box, r_cut=10, coulomb=False) / 1e10
+    force = pair_force(pos1, pos2, par1 ,par2 ,sigma_c, box, r_cut=10, coulomb=False)
     force_ref = 0.00030716067 * np.array([0, 4, 3]) / 5
     npt.assert_almost_equal(force, force_ref)
 

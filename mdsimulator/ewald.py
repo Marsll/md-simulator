@@ -56,7 +56,7 @@ def longrange(pos, q, box, k_max, alpha, potential=True, forces=True):
             return U
 
     if forces:
-        F = 1 / (4 * np.pi * eps * 1e-10) * 2 * pre * np.sum(
+        F = 1 / (4 * np.pi * eps) * 2 * pre * np.sum(
             (tmp[na, :, na] * ((q[:, na] * np.imag
                                 (sk * np.exp(1j * (np.einsum('ki,ji', k, pos)))))
                                [:, :, na] * k[na, :, :])), axis=1)
