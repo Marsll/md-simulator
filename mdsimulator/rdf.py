@@ -28,7 +28,7 @@ def compute_distances(ppos, box):
     return np.asarray(rs)
 
 
-def rdf(sample, box, num_bins=50):
+def rdf(sample, box, num_bins=80):
     """Create a histogram for the mean distances of all particles 
     over all time steps t 
     weighted with the radial distribution of an ideal gas.

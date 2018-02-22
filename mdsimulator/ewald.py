@@ -39,7 +39,7 @@ def longrange(pos, q, box, k_max, alpha, potential=True, forces=True):
 
     if box.shape[-1] != pos.shape[-1]:
         raise ValueError(
-            'Dimension missmatch: postions %iD, box %iD' % (pos.shape[-1],
+            'Dimension missmatch: positions %iD, box %iD' % (pos.shape[-1],
                                                             box.shape[-1]))
 
     na = np.newaxis

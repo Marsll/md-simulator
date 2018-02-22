@@ -23,17 +23,18 @@ def plot_positions(ppos, charges):
         plt.plot(*ppos.T, np.zeros_like(y), "o", color=colorsequence)
 
 
-def plot_forces(ppos, forces):
-    fig = plt.figure()
-    dims = ppos.shape[1]
-
-    if dims == 3:
-        ax = fig.gca(projection='3d')
-        ax.quiver(*ppos.T, *forces.T, length=0.1, normalize=True)
-    elif dims == 2:
-        plt.quiver(*ppos.T, *forces.T)
-    elif dims == 1:
-        plt.quiver(*ppos.T, *forces.T)
+def plot_energies(*args):
+    plt.figure()
+    ax = plt.subplot(111)
+    ax.set_title("Energy over course of Markov chain", y=1.05)
+    for arg in args:
+        if type(arg) == tuple:
+            ax.plot(arg[0], label=arg[1])
+        else:
+            raise Exception(
+                "Arguments should be tuple, where the first index corresponds to an ndarray of energies and the second to a string labeling which part of the energy")
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
+              ncol=3, fancybox=True, shadow=True)
 
 
 def grid_positions(types, box, noise):

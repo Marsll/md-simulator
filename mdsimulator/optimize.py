@@ -3,6 +3,7 @@ from .neighbor_list import NeighborList
 from .short_ranged import potentials
 from .ewald import longrange, self_energy
 from .metropolis import mcmc_step
+import scipy.constants
 
 
 class Optimizer:
@@ -29,10 +30,12 @@ class Optimizer:
 
         self.run_options = {
             "n_steps": 100,
-            "beta": 1000,
+            "temperature": 300,
             "step_width": 0.1,
             "storeppos": False
         }
+
+        self.set_beta()
 
     def get_system(self, box, ppos, params, r_cut, alpha, k_max):
         self.box = box
@@ -67,6 +70,12 @@ class Optimizer:
                 self.run_options[key] = kwargs[key]
             else:
                 raise Exception("Unexpected argument")
+        self.set_beta()
+
+    def set_beta(self):    
+        na = scipy.constants.Avogadro
+        kB = scipy.constants.Boltzmann
+        self.beta = 1000 / na / (self.run_options["temperature"] * kB)
 
     def run(self):
         for _ in range(self.run_options["n_steps"]):
@@ -74,7 +83,7 @@ class Optimizer:
                 self.ppos, self.params, self.sigma_c, self.box,
                 self.r_cut, self.alpha, self.k_max, self.nbs, self.nl,
                 self.e_short, self.e_long,
-                self.run_options["step_width"], self.run_options["beta"])
+                self.run_options["step_width"], self.beta)
 
             self.e_shorts.append(self.e_short)
             self.e_longs.append(self.e_long)
