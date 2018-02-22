@@ -33,3 +33,22 @@ def plot_forces(ppos, forces):
         plt.quiver(*ppos.T, *forces.T)
     elif dims == 1:
         plt.quiver(*ppos.T, *forces.T)
+
+def grid_positions(types, box):
+    d = len(box)
+    l = min(box)
+    ty = np.unique(types)
+    number1 = len(types[types == ty[0]])
+    number2 = len(types[types == ty[1]])
+    n1 = number1**(1 / d)
+    n2 = number2**(1 / d)
+    
+    x = np.linspace(0, l, n1, endpoint=False)
+    xx, yy, zz = np.meshgrid(x,x,x)
+    positions1 = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
+    
+    x = np.linspace(l / 2 / n2, l + l / 2 / n2, n2, endpoint=False)
+    xx, yy, zz = np.meshgrid(x,x,x)
+    positions2 = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
+    positions = np.concatenate((positions1, positions2), axis=0)
+    return positions
