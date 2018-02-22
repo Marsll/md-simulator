@@ -44,7 +44,7 @@ def pair_force(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
             f2 = np.sqrt(2 / np.pi) / sigma_c * np.exp(- r12**2 / (2 * sigma_c**2))
             force += q1 * q2 / (4 * np.pi * eps * r12) * (f1 + f2)
     direction = dist / r12
-    return force * direction * 1e10
+    return force * direction
 
 @jit
 def pair_potential(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=True):
@@ -126,7 +126,7 @@ def pair_interactions(r1, r2, par1, par2, sigma_c, box, r_cut, lj=True, coulomb=
             f2 = np.sqrt(2 / np.pi) / sigma_c * np.exp(- r12**2 / (2 * sigma_c**2))
             force += q1 * q2 / (4 * np.pi * eps * r12) * (f1 + f2)
     direction = dist / r12
-    return potential, force * direction * 1e10
+    return potential, force * direction 
     
     
 @jit    

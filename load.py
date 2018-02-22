@@ -27,6 +27,7 @@ positions = np.concatenate((positions1, positions2), axis=0)
 '''
 
 
+positions = np.random.rand(128,3) * box[0]
 # q, epsilon, sigma, m
 params = np.empty([len(positions), 4])
 
@@ -55,7 +56,7 @@ k_max = 10
 # Specify options for the Markov Chain optimization
 
 # Number of steps in the chain
-n_steps = 10
+n_steps = 50
 
 # beta = 1/(kB * T)
 # high beta - low temperature - small chance to accept if energy higher
@@ -87,8 +88,8 @@ ppos_series = opt.get_ppos_series()
 last_ppos = opt.get_ppos()
 
 
-plt.plot(epots, label="total")
-plt.plot(e_shorts, label="short")
+#plt.plot(epots[1000:], label="total")
+#plt.plot(e_shorts[1000:], label="short")
 plt.plot(e_longs, label="long")
 plt.plot(e_selfs, label="self")
 plt.legend()
