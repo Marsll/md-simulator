@@ -43,7 +43,7 @@ k_max = 10
 # Specify options for the Markov Chain optimization
 
 # Number of steps in the chain
-n_steps = 50
+n_steps = 10
 
 # beta = 1/(kB * T)
 # high beta - low temperature - small chance to accept if energy higher
@@ -65,11 +65,9 @@ opt.set_run_options(n_steps=n_steps, temperature=temperature,
 ############################################################################
 # Run the optimization and obtain energies and positions
 opt.run()
-#histo, bins = rdf.rdf(np.asarray(opt.get_ppos_series()), box)
+el1, el2, histo1, histo2, bins = rdf.rdf_fast_unique(np.asarray(opt.get_ppos_series()), types, box)
+analysis.plot_rdfs(histo1, histo2, bins, el1, el2)
 
-# plt.figure()
-# plt.title("Radial distribution function")
-# plt.plot(bins, histo)
 
 epots = opt.get_total_energies()
 e_shorts = opt.get_short_energies()

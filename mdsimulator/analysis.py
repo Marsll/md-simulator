@@ -57,3 +57,10 @@ def grid_positions(types, box, noise):
     positions = np.concatenate((positions1, positions2), axis=0)
     displacement = noise * np.random.rand(*positions.shape)
     return back_map(positions + displacement, box)
+
+def plot_rdfs(hist1, hist2, bins, element1, element2):
+    plt.figure()
+    plt.title("Radial distribution function")
+    plt.plot(bins, hist1, label=str(element1))
+    plt.plot(bins, hist2, label=str(element2))
+    plt.legend()
