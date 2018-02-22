@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 import numpy as np
+from .metropolis import back_map
 
 
 def plot_positions(ppos, charges):
@@ -34,21 +35,24 @@ def plot_forces(ppos, forces):
     elif dims == 1:
         plt.quiver(*ppos.T, *forces.T)
 
-def grid_positions(types, box):
+
+def grid_positions(types, box, noise):
     d = len(box)
-    l = min(box)
+    length = min(box)
     ty = np.unique(types)
     number1 = len(types[types == ty[0]])
     number2 = len(types[types == ty[1]])
-    n1 = number1**(1 / d)
-    n2 = number2**(1 / d)
-    
-    x = np.linspace(0, l, n1, endpoint=False)
-    xx, yy, zz = np.meshgrid(x,x,x)
+    n1 = np.ceil(number1**(1 / d))
+    n2 = np.ceil(number2**(1 / d))
+
+    x = np.linspace(0, length, n1, endpoint=False)
+    xx, yy, zz = np.meshgrid(x, x, x)
     positions1 = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
-    
-    x = np.linspace(l / 2 / n2, l + l / 2 / n2, n2, endpoint=False)
-    xx, yy, zz = np.meshgrid(x,x,x)
+
+    x = np.linspace(length / 2 / n2, length + length / 2 / n2,
+                    n2, endpoint=False)
+    xx, yy, zz = np.meshgrid(x, x, x)
     positions2 = np.vstack([xx.flatten(), yy.flatten(), zz.flatten()]).T
     positions = np.concatenate((positions1, positions2), axis=0)
-    return positions
+    displacement = noise * np.random.rand(*positions.shape)
+    return back_map(positions + displacement, box)

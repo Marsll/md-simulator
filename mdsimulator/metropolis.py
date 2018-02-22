@@ -6,7 +6,7 @@ from .ewald import longrange, self_energy
 def mcmc_step(ppos, params, sigma_c, box, r_cut, alpha, k_max,
               nbs, nl, e_short, e_long, step_width, beta):
     """One Markov chain step in the Metropolis Monte-Carlo optimization. 
-    
+
     Arguments:
         ppos        (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles)   
         params      (ndarray):      A two-dimensional array with shape (n,4) (charge, epsillon, sigma, mass) prameters of all paricles 
@@ -21,7 +21,7 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, alpha, k_max,
         e_long      (float):        A float (ong ranged potential energy of the system)
         step_width  (float):        A positive float (scaling factor for the trial step)
         beta        (float):        A positive float (1 / (k_B T))
-     
+
     Returns:
         potential   (float):        Potential energy of the whole system (for the trial step or the old one)
     """
@@ -33,7 +33,7 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, alpha, k_max,
     e_short_trial = potentials(ppos_trial, params, sigma_c, nl, nbs, r_cut)
 
     e_long_trial = longrange(ppos, params[:, 0], box, k_max, alpha,
-                       potential=True, forces=False)
+                             potential=True, forces=False)
 
     e_trial = e_short_trial + e_long_trial
 
@@ -46,15 +46,15 @@ def mcmc_step(ppos, params, sigma_c, box, r_cut, alpha, k_max,
 def back_map(ppos, box):
     """Map particles which are outside of the box back into the box,
     using periodic boundary conditions.
-    
+
     Arguments:
         ppos        (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles)   
         box         (ndarray):      A one dimensional numpy-array with d elements (size of preriodic box)
-     
+
     Returns:
         ppos        (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles, which are all inside the box) 
-    """   
-    
+    """
+
     for i, length in enumerate(box):
         while any(ppos[:, i] >= length):
             ppos.T[i][ppos[:, i] >= length] -= length

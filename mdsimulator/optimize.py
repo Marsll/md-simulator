@@ -110,4 +110,4 @@ class Optimizer:
         return self.e_longs
 
     def get_ppos_series(self):
-        return self.ppos
+        return self.ppos_arr
