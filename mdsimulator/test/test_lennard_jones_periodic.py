@@ -1,9 +1,12 @@
-#from ..lennard_jones_periodic import lennard_jones_forces, lennard_jones_potential, all_lennard_jones_forces, all_lennard_jones_potential, lennard_jones
+"""tests for short_ranged for the lennard jones forces and potential"""
+
 from ..neighbor_order_pbc import create_nb_order
 from ..neighbor_list import NeighborList
 from ..short_ranged import pair_potential, pair_force, potentials
 import numpy as np
 import numpy.testing as npt
+import scipy.constants as const
+
 
 def test_potential_1d_0():
     pos1 = np.array([0])
@@ -37,7 +40,7 @@ def test_force_3d():
     par1 = np.ones(3)
     par2 = np.ones(3)
     sigma_c = 1
-    force = pair_force(pos1, pos2, par1 ,par2 ,sigma_c, box, r_cut=10, coulomb=False)
+    force = pair_force(pos1, pos2, par1 ,par2 ,sigma_c, box, r_cut=10, coulomb=False) / 1e10
     force_ref = 0.00030716067 * np.array([0, 4, 3]) / 5
     npt.assert_almost_equal(force, force_ref)
 

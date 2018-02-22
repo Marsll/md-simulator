@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.testing as npt
 from .neighbor_order_pbc import get_n_cells
 
 
@@ -12,12 +11,15 @@ class NeighborList(object):
     In self.list the particles that correspond to the cell point to
     each other - they are linked - until there are no more.
     Then the last pointer is simply -1.
-    ToDo:
-    - Edge cases: particles cannot be on the edges of the box
-        in particular the right and upper edge
     """
 
     def __init__(self, box, ppos, cell_width):
+        """
+        Arguments:
+            ppos        (ndarray):      A two-dimensional array with shape (n,d) (Positions of all particles)   
+            box         (ndarray):      A one dimensional numpy-array with d elements  (size of preriodic box)
+            cell_width  (float):        Cell width
+        """
         self.box = np.atleast_1d(np.asarray(box))
 
         self.ppos = ppos
@@ -70,3 +72,4 @@ class NeighborList(object):
             cell_index += indexes[i] * np.prod(self.n_cells[i + 1:])
 
         return cell_index.astype(np.int)
+

@@ -12,6 +12,7 @@ with np.load('sodium-chloride-example.npz') as fh:
     positions = fh['positions']
     types = fh['types']
     parameters = fh['parameters'].item()
+    
 
 '''
 # new grid test positions, which should be nearly optimal
