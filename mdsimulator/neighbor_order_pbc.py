@@ -8,14 +8,15 @@ of interactions."""
 import numpy as np
 import itertools
 
+
 def get_n_cells(box, cell_width):
     """
     Return a numpy array with the number of cells in each dimension d.
-    
+
     Arguments:
         box          (ndarray):      A one dimensional numpy-array with d elements  (size of preriodic box)
         cell_width   (float):        Cell width
-  
+
     Returns:
         n_cells       (ndarray):      A one dimensional numpy-array with d elements (number of cells in each dimension d)
     """
@@ -23,12 +24,13 @@ def get_n_cells(box, cell_width):
     n_cells = np.floor(box / cell_width).astype(np.int)
     return n_cells
 
+
 def create_cell_array(n_cells):
     """
     Return a d dimensional numpy array, where each element represents one cell.
     Arguments:
         n_cells       (ndarray):      A one dimensional numpy-array with d elements (number of cells in each dimension d)
-  
+
     Returns:
         cell_array    (ndarray):      A d dimensional array (representing all cells)
     """
@@ -37,14 +39,15 @@ def create_cell_array(n_cells):
     cell_array = cell_array.reshape(n_cells)
     return cell_array
 
+
 def get_neighbors(cell_array):
     """
     Compute the neighbor cell of each cell with periodic boundary conditions.
     There is no double counting of pairs.
-    
+
     Arguments:
         cell_array    (ndarray):      A d dimensional array (representing all cells)
-  
+
     Returns:
         nbs    (list):      A list of n numpy arrays of different size (which contain the neighbor cells of each cell)
     """
@@ -57,7 +60,7 @@ def get_neighbors(cell_array):
     neighbors = np.stack(columns, axis=-1)
 
     neighbors = np.where(neighbors > neighbors[:, [0]], neighbors, -1)
- 
+
     neighbors = neighbors[:, 1:]
 
     nbs = []
@@ -65,6 +68,7 @@ def get_neighbors(cell_array):
         row = np.unique(row)
         nbs.append(row[row != -1])
     return nbs
+
 
 def create_nb_order(box, cell_width):
     """Combines the above functions get_n_cells, create_cell_array and
