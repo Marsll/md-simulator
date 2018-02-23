@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
-
 import numpy as np
 
 class Solver():
@@ -19,12 +13,12 @@ class Solver():
     def newton(self,vn=None):
         if vn is None:
             vn = np.zeros_like(self.po)
-        vnn = vn+F(self.po,vn,self.params)/self.m[:,np.newaxis]*self.dt
+        vnn = vn+self.f(self.po,vn,self.params)/self.m[:,np.newaxis]*self.dt
         self.p = (self.po +(vnn+vn)/2*self.dt)%(self.params[1]-1)
 
     def verlet(self):
         tmp = self.p
-        self.p = (F(self.p,(self.p-self.po)/self.dt,self.params)/self.m[:,np.newaxis]*self.dt**2+2*self.p-self.po)%(self.params[1]-1)
+        self.p = (self.f(self.p,(self.p-self.po)/self.dt,self.params)/self.m[:,np.newaxis]*self.dt**2+2*self.p-self.po)%(self.params[1]-1)
         self.po = tmp
         
     def run(self,steps):
@@ -39,4 +33,3 @@ class Solver():
         print('changed from:  \n'+ str(self.params) +'\n to: \n' +str(params))
         self.params=params
             
-
